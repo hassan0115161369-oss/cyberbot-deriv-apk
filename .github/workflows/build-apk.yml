@@ -1,4 +1,4 @@
-name: Build CyberBot Deriv APK
+name: Build CyberBot Deriv APK v6
 
 on:
   push:
@@ -27,20 +27,39 @@ jobs:
       - name: Install Apache Cordova
         run: npm install -g cordova
 
-      - name: Create Cordova Android Project
+      - name: Create & Configure Cordova Android Project
         run: |
           cordova create cyberbot_app com.hassan.cyberbotderiv "CyberBot Deriv Pro"
           cp index.html cyberbot_app/www/index.html
+          cp *.png cyberbot_app/www/ 2>/dev/null || true
+          cp *.jpg cyberbot_app/www/ 2>/dev/null || true
           cd cyberbot_app
           cordova platform add android
+          cat << 'EOF' > config.xml
+          <?xml version='1.0' encoding='utf-8'?>
+          <widget id="com.hassan.cyberbotderiv" version="6.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android">
+              <name>CyberBot Deriv Pro</name>
+              <description>AI Trading Robot with Deriv API and Economic News Radar</description>
+              <author email="support@cyberbot.local">Hassan Omar</author>
+              <content src="index.html" />
+              <access origin="*" />
+              <allow-navigation href="*" />
+              <allow-intent href="http://*/*" />
+              <allow-intent href="https://*/*" />
+              <platform name="android">
+                  <uses-permission android:name="android.permission.INTERNET" />
+                  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+              </platform>
+          </widget>
+          EOF
           cordova build android
 
       - name: Rename APK
         run: |
-          cp cyberbot_app/platforms/android/app/build/outputs/apk/debug/app-debug.apk CyberBot-Deriv-Pro.apk
+          cp cyberbot_app/platforms/android/app/build/outputs/apk/debug/app-debug.apk CyberBot-Deriv-Pro-v6.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CyberBot-Deriv-Pro-APK
-          path: CyberBot-Deriv-Pro.apk
+          name: CyberBot-Deriv-Pro-v6-APK
+          path: CyberBot-Deriv-Pro-v6.apk
