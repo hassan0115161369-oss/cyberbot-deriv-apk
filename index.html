@@ -3,504 +3,823 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>CYBERBOT PRO v5.0</title>
-  <link rel="icon" id="appFavicon" href="icon.png" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob: ws: wss: http: https:;">
+  <title>CyberBot Deriv Pro v6.0 Ultimate</title>
   <style>
     :root {
-      --bg-dark: #070912;
-      --card-bg: rgba(14, 19, 36, 0.84);
-      --border: rgba(0, 240, 255, 0.22);
+      --bg-deep: #03060f;
+      --bg-card: rgba(10, 17, 35, 0.88);
+      --bg-glass: rgba(16, 28, 56, 0.72);
       --cyan: #00f0ff;
-      --purple: #9d4edd;
-      --gold: #ffcc00;
+      --blue: #2979ff;
+      --purple: #8b5cf6;
       --green: #00e676;
       --red: #ff3b5c;
-      --text: #f3f6ff;
-      --muted: #9aa7c7;
+      --gold: #ffcc00;
+      --text: #f8fafc;
+      --muted: #8fa2c7;
+      --border: rgba(0, 240, 255, 0.24);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
 
     body {
-      background-color: var(--bg-dark);
-      background-image: linear-gradient(rgba(7,9,18,0.72), rgba(7,9,18,0.88)), url('bg.png');
-      background-size: cover;
-      background-position: center;
+      background-color: var(--bg-deep);
+      background-image:
+        radial-gradient(circle at 12% 14%, rgba(0, 240, 255, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 88% 20%, rgba(139, 92, 246, 0.20) 0%, transparent 48%),
+        radial-gradient(circle at 50% 90%, rgba(41, 121, 255, 0.16) 0%, transparent 55%),
+        linear-gradient(180deg, rgba(3, 6, 15, 0.84) 0%, rgba(3, 6, 15, 0.95) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%2300f0ff' stroke-opacity='0.06' stroke-width='1'%3E%3Cpath d='M0 70h140M70 0v140'/%3E%3Ccircle cx='70' cy='70' r='34'/%3E%3Ccircle cx='70' cy='70' r='54' stroke-dasharray='4 6'/%3E%3C/g%3E%3C/svg%3E");
       background-attachment: fixed;
       color: var(--text);
       min-height: 100vh;
-      padding-bottom: 86px;
+      overflow-x: hidden;
     }
 
-    /* الشريط العلوي */
+    /* شاشة الدخول والربط مع Deriv */
+    .auth-overlay {
+      position: fixed; inset: 0; z-index: 120;
+      background: radial-gradient(circle at top, #0d1d42 0%, #03060f 85%);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 20px; overflow-y: auto;
+    }
+    .auth-box {
+      width: 100%; max-width: 420px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 26px 22px;
+      box-shadow: 0 0 45px rgba(0, 240, 255, 0.16);
+      backdrop-filter: blur(16px); text-align: center;
+    }
+    .robot-orb {
+      width: 92px; height: 92px; margin: 0 auto 14px; border-radius: 50%;
+      border: 2px solid var(--cyan); background: radial-gradient(circle, rgba(0,240,255,0.24), #060c1d);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 28px rgba(0, 240, 255, 0.42);
+    }
+    .auth-title { font-size: 24px; font-weight: 900; }
+    .auth-title span { color: var(--cyan); }
+    .auth-sub { font-size: 12px; color: var(--muted); margin: 6px 0 18px; line-height: 1.6; }
+
+    .input-group { text-align: right; margin-bottom: 13px; }
+    .input-group label { display: block; font-size: 12px; color: var(--cyan); margin-bottom: 6px; font-weight: 700; }
+    .input-field {
+      width: 100%; padding: 12px 14px; border-radius: 13px;
+      background: rgba(4, 9, 22, 0.92); border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; font-size: 14px; outline: none; transition: 0.2s;
+    }
+    .input-field:focus { border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,240,255,0.22); }
+
+    .btn-primary {
+      width: 100%; padding: 14px; border-radius: 14px; border: none;
+      background: linear-gradient(135deg, #00e5ff 0%, #2979ff 52%, #7c3aed 100%);
+      color: #fff; font-size: 15px; font-weight: 800; cursor: pointer;
+      box-shadow: 0 6px 22px rgba(41, 121, 255, 0.35); transition: 0.2s;
+    }
+    .btn-secondary {
+      width: 100%; padding: 12px; border-radius: 14px; margin-top: 10px;
+      background: rgba(0, 240, 255, 0.08); border: 1px solid var(--border);
+      color: var(--cyan); font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+
+    /* الهيدر وشريط الأخبار العاجل */
+    .app-shell { display: none; padding-bottom: 88px; }
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: rgba(7, 9, 18, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 16px; background: rgba(3, 6, 15, 0.92);
+      backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);
+    }
+    .brand-row { display: flex; align-items: center; gap: 10px; }
+    .brand-badge {
+      width: 38px; height: 38px; border-radius: 12px;
+      border: 1.5px solid var(--cyan); background: #081226;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 12px rgba(0,240,255,0.28);
+    }
+    .brand-row h2 { font-size: 15px; font-weight: 900; }
+    .brand-row h2 span { color: var(--cyan); }
+    .live-dot { font-size: 11px; color: var(--green); font-weight: 700; }
+
+    .news-ticker {
+      background: linear-gradient(90deg, rgba(255, 204, 0, 0.14), rgba(0, 240, 255, 0.12));
+      border-bottom: 1px solid rgba(255, 204, 0, 0.28);
+      padding: 7px 14px; font-size: 12px; display: flex; align-items: center; gap: 8px;
+      cursor: pointer;
+    }
+    .news-pill-tag {
+      background: var(--gold); color: #050812; font-weight: 900;
+      padding: 2px 8px; border-radius: 8px; font-size: 10px; white-space: nowrap;
+    }
+    .news-ticker-text { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; font-weight: 600; }
+
+    .bot-status-pill {
+      padding: 6px 13px; border-radius: 20px; font-size: 12px; font-weight: 800;
+      background: rgba(255, 59, 92, 0.15); color: var(--red); border: 1px solid var(--red);
+    }
+    .bot-status-pill.active {
+      background: rgba(0, 230, 118, 0.16); color: var(--green); border-color: var(--green);
+      box-shadow: 0 0 14px rgba(0, 230, 118, 0.3);
     }
 
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand img {
-      width: 42px; height: 42px; border-radius: 12px;
-      object-fit: cover; border: 1.5px solid var(--cyan);
-      box-shadow: 0 0 12px rgba(0,240,255,0.35);
-      background: #101629;
-    }
-    .brand h1 { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; color: #fff; }
-    .brand span { font-size: 11px; color: var(--cyan); display: block; }
+    .container { max-width: 560px; margin: 0 auto; padding: 14px; }
+    .page { display: none; animation: fadeIn 0.2s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    .status-pill {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      border: 1px solid var(--red);
-      color: var(--red);
-      background: rgba(255, 59, 92, 0.12);
-    }
-    .status-pill.active {
-      border-color: var(--green);
-      color: var(--green);
-      background: rgba(0, 230, 118, 0.14);
-      box-shadow: 0 0 12px rgba(0,230,118,0.25);
-    }
-
-    .container { padding: 14px; max-width: 520px; margin: 0 auto; }
-    .tab-page { display: none; animation: fadeIn 0.2s ease; }
-    .tab-page.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* البطاقات */
     .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 15px;
-      margin-bottom: 14px;
-      backdrop-filter: blur(10px);
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 15px; margin-bottom: 14px;
+      backdrop-filter: blur(12px);
     }
-    .card-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--cyan);
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 11px; }
+    .card-head strong { font-size: 14px; }
 
-    /* شبكة الرصيد */
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .stat-box {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 10px 8px;
-      text-align: center;
+    .hero-card {
+      background: linear-gradient(135deg, rgba(12, 28, 66, 0.94), rgba(26, 15, 62, 0.92));
+      border: 1px solid rgba(0, 240, 255, 0.38);
     }
-    .stat-box small { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-    .stat-box strong { font-size: 15px; color: #fff; }
-    .green { color: var(--green) !important; }
-    .red { color: var(--red) !important; }
-    .gold { color: var(--gold) !important; }
+    .bal-big { font-size: 31px; font-weight: 900; color: #fff; margin: 5px 0; direction: ltr; text-align: right; }
 
-    /* السعر والإشارة */
-    .price-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
+    .stats-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .mini-stat {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 9px 6px; text-align: center;
     }
-    .live-price { font-size: 28px; font-weight: 800; color: #fff; direction: ltr; }
-    .signal-badge {
-      padding: 8px 14px;
-      border-radius: 12px;
-      font-weight: 800;
-      font-size: 14px;
-      background: rgba(0, 230, 118, 0.16);
-      color: var(--green);
-      border: 1px solid var(--green);
+    .mini-stat small { display: block; font-size: 10px; color: var(--muted); }
+    .mini-stat strong { font-size: 14px; }
+
+    .signal-panel {
+      padding: 13px; border-radius: 14px; text-align: center;
+      background: rgba(0, 230, 118, 0.12); border: 1px solid var(--green);
     }
+    .signal-panel.sell { background: rgba(255, 59, 92, 0.12); border-color: var(--red); }
+    .signal-panel.pause { background: rgba(255, 204, 0, 0.14); border-color: var(--gold); }
+
+    /* الأسواق والشموع */
+    .cat-bar { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 10px; }
+    .cat-btn {
+      padding: 6px 13px; border-radius: 11px; border: 1px solid transparent;
+      background: rgba(255,255,255,0.05); color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .cat-btn.active { background: rgba(0,240,255,0.15); border-color: var(--cyan); color: var(--cyan); }
+
+    .market-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 8px; border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer;
+    }
+    .market-item:last-child { border-bottom: none; }
+
+    .tf-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin: 10px 0; }
+    .tf-btn {
+      padding: 6px 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.05); color: var(--muted); font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .tf-btn.active { background: var(--blue); color: #fff; border-color: var(--cyan); }
 
     canvas#chartCanvas {
-      width: 100%;
-      height: 140px;
-      background: rgba(5, 8, 18, 0.7);
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.08);
-      display: block;
-      margin-bottom: 12px;
+      width: 100%; height: 215px; background: rgba(3, 7, 18, 0.9);
+      border-radius: 14px; border: 1px solid rgba(0,240,255,0.2); display: block;
     }
 
-    /* المدخلات والأزرار */
-    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
-    select, input[type="text"], input[type="number"], input[type="password"] {
-      width: 100%;
-      padding: 11px 12px;
-      border-radius: 11px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(5, 8, 18, 0.85);
-      color: #fff;
-      font-size: 14px;
-      outline: none;
+    /* بطاقات الأخبار */
+    .news-card {
+      padding: 13px; border-radius: 14px; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px;
     }
-    select:focus, input:focus { border-color: var(--cyan); }
+    .news-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 11px; }
+    .impact-high { background: rgba(255, 59, 92, 0.2); color: var(--red); border: 1px solid var(--red); padding: 2px 8px; border-radius: 8px; font-weight: 800; }
+    .impact-med { background: rgba(255, 204, 0, 0.18); color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; border-radius: 8px; font-weight: 800; }
 
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 13px;
-      border: none;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: 0.2s;
+    .ind-line {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-    .btn-start {
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
-      color: #050812;
-      box-shadow: 0 0 18px rgba(0,240,255,0.3);
-    }
-    .btn-stop {
-      background: linear-gradient(135deg, #ff3b5c, #b5173c);
-      color: #fff;
-    }
-    .btn-outline {
-      background: rgba(255,255,255,0.06);
-      color: var(--cyan);
-      border: 1px solid var(--border);
-      padding: 10px;
-      font-size: 13px;
-      margin-top: 8px;
-    }
+    .ind-line:last-child { border-bottom: none; }
 
-    /* المؤشرات */
-    .ind-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 11px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
-    .ind-item:last-child { border-bottom: none; }
-    .ind-name { font-weight: 700; font-size: 14px; }
-    .ind-desc { font-size: 11px; color: var(--muted); }
-    .ind-val { font-weight: 800; font-size: 14px; text-align: left; }
+    .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: #1e293b; border-radius: 22px; transition: .3s; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
+    input:checked + .slider { background: var(--cyan); }
+    input:checked + .slider:before { transform: translateX(20px); background: #03060f; }
 
-    /* سجل الصفقات */
-    .trade-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255,255,255,0.04);
-      padding: 11px 12px;
-      border-radius: 12px;
-      margin-bottom: 8px;
-      border-right: 4px solid var(--green);
+    .trade-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 12px; border-radius: 13px; background: rgba(255,255,255,0.04);
+      margin-bottom: 8px; border-right: 4px solid var(--green);
     }
-    .trade-item.loss { border-right-color: var(--red); }
+    .trade-row.loss { border-right-color: var(--red); }
 
-    /* القائمة السفلية */
+    /* التنقل السفلي */
     .bottom-nav {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      z-index: 30;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      background: rgba(7, 9, 18, 0.96);
-      border-top: 1px solid var(--border);
-      padding: 8px 4px 12px;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      background: rgba(3, 6, 15, 0.96); border-top: 1px solid var(--border);
+      padding: 8px 2px 12px; backdrop-filter: blur(14px);
     }
     .nav-btn {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
+      background: none; border: none; color: var(--muted);
+      font-size: 11px; font-weight: 700; display: flex; flex-direction: column;
+      align-items: center; gap: 3px; cursor: pointer;
     }
-    .nav-btn span.ico { font-size: 18px; }
     .nav-btn.active { color: var(--cyan); }
+    .nav-btn svg { width: 20px; height: 20px; }
+
+    .green { color: var(--green); }
+    .red { color: var(--red); }
+    .cyan { color: var(--cyan); }
+    .gold { color: var(--gold); }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   </style>
 </head>
 <body>
 
-  <!-- الشريط العلوي -->
-  <header class="topbar">
-    <div class="brand">
-      <img id="brandIcon" src="icon.png" alt="Logo" onerror="this.style.background='#00f0ff'" />
-      <div>
-        <h1>CYBERBOT PRO</h1>
-        <span id="modeLabel">وضع المحاكاة الذكي • v5.0</span>
+  <!-- شاشة الدخول والربط بحساب Deriv -->
+  <div id="authScreen" class="auth-overlay">
+    <div class="auth-box">
+      <div class="robot-orb">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="1.8">
+          <rect x="3" y="8" width="18" height="12" rx="4"/>
+          <circle cx="9" cy="14" r="1.5" fill="#00f0ff"/>
+          <circle cx="15" cy="14" r="1.5" fill="#00f0ff"/>
+          <path d="M12 2v6M8 2h8"/>
+        </svg>
       </div>
+      <div class="auth-title">CyberBot <span>Deriv Pro v6</span></div>
+      <p class="auth-sub">روبوت تداول ذكي متصل بـ Deriv API مع رادار مراقبة الأخبار الاقتصادية وإدارة المخاطر</p>
+
+      <div class="input-group">
+        <label>Deriv API Token (للتداول الحقيقي أو التجريبي)</label>
+        <input type="password" id="derivTokenInput" class="input-field" placeholder="أدخل رمز API Token الخاص بك..." />
+      </div>
+
+      <button class="btn-primary" onclick="loginWithToken()">دخول وربط الحساب بـ Deriv</button>
+      <button class="btn-secondary" onclick="loginQuickMode()">دخول فوري (أسعار Deriv الحية + رادار الأخبار)</button>
+      <p id="authError" style="color:var(--red); font-size:12px; margin-top:10px; display:none;"></p>
     </div>
-    <div id="botStatusPill" class="status-pill">متوقف</div>
-  </header>
+  </div>
 
-  <main class="container">
-
-    <!-- 1. الشاشة الرئيسية للتداول -->
-    <section id="tab-trade" class="tab-page active">
-      <div class="card">
-        <div class="card-title">
-          <span>ملخص الحساب</span>
-          <span class="gold" id="brokerTag">Headway MT5</span>
+  <!-- التطبيق الرئيسي -->
+  <div id="appShell" class="app-shell">
+    <header class="topbar">
+      <div class="brand-row">
+        <div class="brand-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2.2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/>
+          </svg>
         </div>
-        <div class="stats-grid">
-          <div class="stat-box">
-            <small>الرصيد الحالي</small>
-            <strong id="balanceVal">$1,000.00</strong>
-          </div>
-          <div class="stat-box">
-            <small>صافي الربح</small>
-            <strong id="profitVal" class="green">+$0.00</strong>
-          </div>
-          <div class="stat-box">
-            <small>نسبة النجاح</small>
-            <strong id="winRateVal" class="gold">0%</strong>
-          </div>
+        <div>
+          <h2>CyberBot <span>v6.0</span></h2>
+          <div class="live-dot" id="connLabel">● متصل بـ Deriv WebSocket</div>
         </div>
       </div>
+      <div id="botPill" class="bot-status-pill">متوقف</div>
+    </header>
 
-      <div class="card">
-        <div class="card-title">
-          <span id="activePairTitle">XAUUSD • الذهب</span>
-          <span id="activeTfTitle">فريم 5 دقائق</span>
-        </div>
-        <div class="price-row">
-          <div class="live-price" id="livePrice">2654.20</div>
-          <div class="signal-badge" id="aiSignal">تحليل الذكاء: شراء ▲</div>
-        </div>
-        <canvas id="chartCanvas"></canvas>
+    <!-- شريط تنبيه الأخبار الفوري أعلى الشاشة -->
+    <div class="news-ticker" onclick="switchPage('news', document.querySelectorAll('.nav-btn')[2])">
+      <span class="news-pill-tag">رادار الأخبار</span>
+      <div class="news-ticker-text" id="tickerHeadline">جاري مراقبة الأسواق والأخبار الاقتصادية الحية...</div>
+      <span class="gold" style="font-size:11px; font-weight:800;">التفاصيل ←</span>
+    </div>
 
-        <div class="row-2">
-          <div>
-            <label>الأصل / الزوج</label>
-            <select id="pairSelect" onchange="changePair()">
-              <option value="XAUUSD">XAUUSD (الذهب)</option>
-              <option value="BTCUSD">BTCUSD (بيتكوين)</option>
-              <option value="EURUSD">EURUSD (يورو/دولار)</option>
-              <option value="R_100">R_100 (Deriv)</option>
-            </select>
+    <main class="container">
+
+      <!-- 1. الرئيسية -->
+      <section id="page-home" class="page active">
+        <div class="card hero-card">
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted);">
+            <span id="accountModeLabel">حساب محاكاة / أسعار حية</span>
+            <span class="gold" id="accountLoginId">DEMO-LIVE</span>
           </div>
-          <div>
-            <label>الفريم الزمني</label>
-            <select id="tfSelect" onchange="updateLabels()">
-              <option value="1M">1 دقيقة</option>
-              <option value="5M" selected>5 دقائق</option>
-              <option value="15M">15 دقيقة</option>
-              <option value="1H">1 ساعة</option>
-            </select>
+          <div class="bal-big" id="balanceDisplay">$10,000.00</div>
+          <div id="pnlDisplay" class="green" style="font-size:13px; font-weight:800;">صافي الربح: +$0.00 (0.00%)</div>
+
+          <div class="stats-3">
+            <div class="mini-stat">
+              <small>نسبة النجاح</small>
+              <strong id="homeWinRate" class="green">0%</strong>
+            </div>
+            <div class="mini-stat">
+              <small>الصفقات</small>
+              <strong id="homeTradesCount" class="cyan">0</strong>
+            </div>
+            <div class="mini-stat">
+              <small>حالة الأخبار</small>
+              <strong id="homeNewsStatus" class="gold">مراقبة نشطة</strong>
+            </div>
           </div>
         </div>
 
-        <button id="toggleBotBtn" class="btn btn-start" onclick="toggleBot()">▶ تشغيل التداول الآلي الآن</button>
-      </div>
-    </section>
+        <div class="card">
+          <div class="card-head">
+            <strong class="cyan">إشارة الذكاء الاصطناعي والروبوت</strong>
+            <span id="homeAssetTag" class="gold" style="font-weight:800; font-size:13px;">R_100</span>
+          </div>
 
-    <!-- 2. شاشة التحليل والمؤشرات -->
-    <section id="tab-analysis" class="tab-page">
-      <div class="card">
-        <div class="card-title"><span>قراءة المؤشرات الفنية المباشرة</span></div>
-        <div class="ind-item">
-          <div>
-            <div class="ind-name">مؤشر القوة النسبية (RSI 14)</div>
-            <div class="ind-desc" id="rsiText">منطقة توازن وزخم إيجابي</div>
+          <div id="signalBox" class="signal-panel">
+            <div style="font-size:11px; color:var(--muted);">تحليل فني + فحص الأخبار</div>
+            <div id="signalTitle" style="font-size:18px; font-weight:900; color:var(--green); margin-top:3px;">شراء قوي (CALL) ▲</div>
+            <div id="signalReason" style="font-size:11px; color:var(--muted); margin-top:3px;">تقاطع EMA إيجابي ولا توجد أخبار معرقلة</div>
           </div>
-          <div class="ind-val green" id="rsiVal">54.2</div>
-        </div>
-        <div class="ind-item">
-          <div>
-            <div class="ind-name">المتوسطات المتحركة (EMA 50 / 200)</div>
-            <div class="ind-desc">تحديد الاتجاه العام للسوق</div>
-          </div>
-          <div class="ind-val green" id="emaVal">اتجاه صاعد</div>
-        </div>
-        <div class="ind-item">
-          <div>
-            <div class="ind-name">مؤشر الزخم (MACD)</div>
-            <div class="ind-desc">تأكيد نقاط الدخول والخروج</div>
-          </div>
-          <div class="ind-val gold" id="macdVal">تقاطع شرائي</div>
-        </div>
-        <div class="ind-item">
-          <div>
-            <div class="ind-name">قوة الاتجاه (ADX)</div>
-            <div class="ind-desc">فلتر منع التداول وقت التذبذب</div>
-          </div>
-          <div class="ind-val" id="adxVal">31.8 (قوي)</div>
-        </div>
-      </div>
-    </section>
 
-    <!-- 3. شاشة سجل الصفقات -->
-    <section id="tab-history" class="tab-page">
-      <div class="card">
-        <div class="card-title">
-          <span>سجل الصفقات المنفذة</span>
-          <span id="tradeCount">0 صفقة</span>
+          <div class="row-2" style="margin-top:12px;">
+            <div>
+              <label style="font-size:11px; color:var(--muted);">الاستراتيجية</label>
+              <select id="strategySelect" class="input-field" style="padding:10px; font-size:13px;">
+                <option value="Trend + News Guard">Trend + News Guard</option>
+                <option value="Auto AI Scalper">Auto AI Scalper</option>
+                <option value="Momentum Break">Momentum Break</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px; color:var(--muted);">قيمة الصفقة ($)</label>
+              <input type="number" id="stakeInput" class="input-field" value="10" min="1" style="padding:10px; font-size:13px;" />
+            </div>
+          </div>
+
+          <button id="toggleBotBtn" class="btn-primary" style="margin-top:14px;" onclick="toggleBot()">▶ تشغيل الروبوت الذكي</button>
         </div>
-        <div id="tradesList">
-          <p style="text-align:center; color:var(--muted); font-size:13px; padding:20px 0;">
-            لا توجد صفقات بعد. اضغط على "تشغيل التداول الآلي" لبدء التنفيذ.
+
+        <div class="card">
+          <div class="card-head">
+            <strong>مراقبة الأسواق الحية</strong>
+            <span class="cyan" style="font-size:12px; cursor:pointer;" onclick="switchPage('markets', document.querySelectorAll('.nav-btn')[1])">جميع الأسواق</span>
+          </div>
+          <div id="homeMarketsList"></div>
+        </div>
+      </section>
+
+      <!-- 2. الأسواق والرسم البياني -->
+      <section id="page-markets" class="page">
+        <div class="card">
+          <div class="card-head">
+            <strong id="chartTitle">Volatility 100 (R_100)</strong>
+            <div style="text-align:left;">
+              <span id="chartPrice" style="font-size:18px; font-weight:900; direction:ltr; display:inline-block;">0.00</span>
+              <div id="chartChange" class="green" style="font-size:11px; font-weight:700;">+0.00%</div>
+            </div>
+          </div>
+
+          <div class="tf-grid">
+            <button class="tf-btn active" onclick="changeTf('M1', this)">M1</button>
+            <button class="tf-btn" onclick="changeTf('M5', this)">M5</button>
+            <button class="tf-btn" onclick="changeTf('M15', this)">M15</button>
+            <button class="tf-btn" onclick="changeTf('H1', this)">H1</button>
+            <button class="tf-btn" onclick="changeTf('H4', this)">H4</button>
+            <button class="tf-btn" onclick="changeTf('D1', this)">D1</button>
+          </div>
+
+          <canvas id="chartCanvas"></canvas>
+
+          <div class="row-2" style="margin-top:12px;">
+            <button class="btn-primary" style="background:linear-gradient(135deg,#00c853,#00e676); color:#040711;" onclick="manualTrade('BUY')">شراء (CALL)</button>
+            <button class="btn-primary" style="background:linear-gradient(135deg,#d50000,#ff3b5c);" onclick="manualTrade('SELL')">بيع (PUT)</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <strong style="display:block; margin-bottom:8px;">قائمة الأصول</strong>
+          <div class="cat-bar">
+            <button class="cat-btn active" onclick="setCategory('all', this)">الكل</button>
+            <button class="cat-btn" onclick="setCategory('deriv', this)">مؤشرات Deriv</button>
+            <button class="cat-btn" onclick="setCategory('forex', this)">الذهب والعملات</button>
+            <button class="cat-btn" onclick="setCategory('crypto', this)">العملات الرقمية</button>
+          </div>
+          <div id="marketsListFull"></div>
+        </div>
+      </section>
+
+      <!-- 3. رادار الأخبار والتنبيهات -->
+      <section id="page-news" class="page">
+        <div class="card">
+          <div class="card-head">
+            <strong class="gold">درع حماية الأخبار التلقائي</strong>
+            <label class="switch"><input type="checkbox" id="newsShieldSwitch" checked onchange="evaluateMarketAndNews()"><span class="slider"></span></label>
+          </div>
+          <p style="font-size:12px; color:var(--muted); line-height:1.6;">
+            يراقب الروبوت الأخبار الاقتصادية وتقلبات السوق لحظة بلحظة. عند رصد خبر عالي التأثير، يقوم بتنبيهك وإيقاف التداول الآلي تلقائياً إذا كان الدرع مفعلاً.
           </p>
+          <button class="btn-secondary" onclick="simulateBreakingNews()">⚡ محاكاة نزول خبر اقتصادي عاجل الآن</button>
         </div>
-      </div>
-    </section>
 
-    <!-- 4. شاشة الإعدادات وتخصيص الشكل -->
-    <section id="tab-settings" class="tab-page">
-      <div class="card">
-        <div class="card-title"><span>تغيير صورة التطبيق والخلفية</span></div>
-        <label>تغيير أيقونة التطبيق (من جهازك)</label>
-        <input type="file" accept="image/*" onchange="changeImage(event, 'icon')" style="margin-bottom:10px; font-size:12px;" />
-
-        <label>تغيير خلفية الشاشة (من جهازك)</label>
-        <input type="file" accept="image/*" onchange="changeImage(event, 'bg')" style="margin-bottom:8px; font-size:12px;" />
-
-        <button class="btn btn-outline" onclick="resetTheme()">استعادة الخلفية والأيقونة الافتراضية</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span>ربط المنصة وإدارة المخاطر</span></div>
-        <div style="margin-bottom:10px;">
-          <label>المنصة / الوسيط</label>
-          <select id="brokerSelect" onchange="saveSettings()">
-            <option value="Headway MT5">Headway MT5</option>
-            <option value="Deriv API">Deriv WebSocket API</option>
-            <option value="MetaApi Cloud">MetaApi Cloud (MT5)</option>
-          </select>
-        </div>
-        <div class="row-2">
-          <div>
-            <label>حجم اللوت (Lot)</label>
-            <input type="number" id="lotInput" value="0.05" step="0.01" onchange="saveSettings()" />
+        <div class="card">
+          <div class="card-head">
+            <strong>الأخبار والتنبيهات المباشرة</strong>
+            <span id="newsCountBadge" class="cyan" style="font-size:12px;">3 أحداث</span>
           </div>
-          <div>
-            <label>وقف الخسارة (نقطة)</label>
-            <input type="number" id="slInput" value="30" onchange="saveSettings()" />
+          <div id="newsFeedList"></div>
+        </div>
+      </section>
+
+      <!-- 4. سجل الصفقات والمؤشرات -->
+      <section id="page-history" class="page">
+        <div class="card">
+          <strong class="cyan" style="display:block; margin-bottom:6px;">المؤشرات الفنية الحية</strong>
+          <div class="ind-line">
+            <span>EMA (9 / 21)</span>
+            <strong id="indEma" class="green">-- / --</strong>
+          </div>
+          <div class="ind-line">
+            <span>RSI (14)</span>
+            <strong id="indRsi" class="cyan">50.0</strong>
+          </div>
+          <div class="ind-line">
+            <span>مؤشر الزخم والتقلب</span>
+            <strong id="indVol" class="gold">مستقر</strong>
           </div>
         </div>
-        <div style="margin-bottom:10px;">
-          <label>مفتاح الربط (API Token / Account ID)</label>
-          <input type="password" id="apiTokenInput" placeholder="أدخل التوكن أو رقم الحساب..." onchange="saveSettings()" />
+
+        <div class="card">
+          <div class="card-head">
+            <strong>سجل الصفقات المنفذة</strong>
+            <span id="historyCountLabel" class="cyan" style="font-size:12px;">0 صفقة</span>
+          </div>
+          <div id="historyList">
+            <p style="text-align:center; color:var(--muted); font-size:13px; padding:18px 0;">لا توجد صفقات بعد.</p>
+          </div>
         </div>
-        <button class="btn btn-start" onclick="saveSettings(true)">حفظ الإعدادات</button>
-      </div>
-    </section>
+      </section>
 
-  </main>
+      <!-- 5. الإعدادات وإدارة المخاطر -->
+      <section id="page-settings" class="page">
+        <div class="card">
+          <strong class="cyan" style="display:block; margin-bottom:12px;">إدارة المخاطر وحماية الحساب</strong>
+          <div class="row-2">
+            <div class="input-group">
+              <label>مدة العقد (Ticks)</label>
+              <input type="number" id="ticksInput" class="input-field" value="5" min="1" max="10" />
+            </div>
+            <div class="input-group">
+              <label>حد الخسارة اليومية ($)</label>
+              <input type="number" id="dailyLossInput" class="input-field" value="150" min="10" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label>هدف الربح اليومي ($)</label>
+            <input type="number" id="dailyProfitInput" class="input-field" value="300" min="10" />
+          </div>
+          <button class="btn-primary" onclick="alert('تم حفظ إعدادات المخاطر بنجاح')">حفظ الإعدادات</button>
+        </div>
 
-  <!-- شريط التنقل السفلي -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="openTab('trade', this)"><span class="ico">📈</span>التداول</button>
-    <button class="nav-btn" onclick="openTab('analysis', this)"><span class="ico">🧠</span>المؤشرات</button>
-    <button class="nav-btn" onclick="openTab('history', this)"><span class="ico">📋</span>الصفقات</button>
-    <button class="nav-btn" onclick="openTab('settings', this)"><span class="ico">⚙️</span>الإعدادات</button>
-  </nav>
+        <div class="card">
+          <strong style="display:block; margin-bottom:10px;">تخصيص المظهر والحساب</strong>
+          <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">رفع صورة خلفية 4K خاصة بك</label>
+          <input type="file" accept="image/*" onchange="changeCustomBg(event)" style="font-size:12px; margin-bottom:12px;" />
+          <button class="btn-secondary" style="border-color:var(--red); color:var(--red);" onclick="logoutSession()">تسجيل الخروج / تغيير التوكن</button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- شريط التنقل السفلي -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" onclick="switchPage('home', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        الرئيسية
+      </button>
+      <button class="nav-btn" onclick="switchPage('markets', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-3 3"/></svg>
+        الشارت
+      </button>
+      <button class="nav-btn" onclick="switchPage('news', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        الأخبار
+      </button>
+      <button class="nav-btn" onclick="switchPage('history', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M16 13H8M16 17H8"/></svg>
+        السجل
+      </button>
+      <button class="nav-btn" onclick="switchPage('settings', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        الإعدادات
+      </button>
+    </nav>
+  </div>
 
   <script>
-    const basePrices = { XAUUSD: 2654.20, BTCUSD: 94250.00, EURUSD: 1.0845, R_100: 1420.50 };
-    let currentPair = 'XAUUSD';
-    let price = basePrices[currentPair];
-    let historyPoints = Array.from({ length: 30 }, (_, i) => price + (Math.random() - 0.5) * 4);
+    const ASSETS = [
+      { symbol: 'R_100', name: 'Volatility 100 Index', cat: 'deriv', price: 1420.50, prev: 1414.00, dec: 2 },
+      { symbol: 'R_75', name: 'Volatility 75 Index', cat: 'deriv', price: 428510.00, prev: 426200.00, dec: 2 },
+      { symbol: '1HZ100V', name: 'Volatility 100 (1s)', cat: 'deriv', price: 892.40, prev: 895.00, dec: 2 },
+      { symbol: 'frxXAUUSD', name: 'XAUUSD • الذهب', cat: 'forex', price: 2654.30, prev: 2641.50, dec: 2 },
+      { symbol: 'frxEURUSD', name: 'EURUSD • يورو/دولار', cat: 'forex', price: 1.0842, prev: 1.0860, dec: 4 },
+      { symbol: 'cryBTCUSD', name: 'BTCUSD • بيتكوين', cat: 'crypto', price: 94210.00, prev: 92800.00, dec: 2 }
+    ];
+
+    let newsEvents = [
+      { id: 1, title: 'مراقبة بيانات التضخم الأمريكية (CPI) وتأثيرها على الذهب والدولار', impact: 'high', currency: 'USD / XAU', time: 'مباشر', activeAlert: false },
+      { id: 2, title: 'ارتفاع السيولة والمضاربات على مؤشرات التقلب (Volatility Indices)', impact: 'med', currency: 'R_100 / R_75', time: 'اليوم', activeAlert: false },
+      { id: 3, title: 'تصريحات البنوك المركزية حول مسار الفائدة والسيولة العالمية', impact: 'med', currency: 'EUR / USD', time: 'اليوم', activeAlert: false }
+    ];
+
+    let ws = null;
+    let isAuthorized = false;
+    let currentSymbol = 'R_100';
+    let currentCat = 'all';
+    let priceHistory = [];
+    let candles = [];
     let botRunning = false;
-    let balance = 1000.00;
-    let totalProfit = 0;
-    let wins = 0;
+    let balance = 10000.00;
+    let startBalance = 10000.00;
     let trades = [];
+    let newsPausedBot = false;
 
-    function openTab(tabName, btn) {
-      document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('tab-' + tabName).classList.add('active');
-      btn.classList.add('active');
+    function connectDerivWS(token = '') {
+      if (ws) ws.close();
+      ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+
+      ws.onopen = () => {
+        document.getElementById('connLabel').textContent = '● متصل بـ Deriv WebSocket';
+        document.getElementById('connLabel').style.color = 'var(--green)';
+        if (token) ws.send(JSON.stringify({ authorize: token }));
+        ASSETS.forEach(a => ws.send(JSON.stringify({ ticks: a.symbol, subscribe: 1 })));
+      };
+
+      ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (data.msg_type === 'authorize') {
+          if (data.error) {
+            document.getElementById('authError').style.display = 'block';
+            document.getElementById('authError').textContent = 'فشل التحقق من التوكن: ' + data.error.message;
+            return;
+          }
+          isAuthorized = true;
+          balance = parseFloat(data.authorize.balance);
+          startBalance = balance;
+          document.getElementById('accountLoginId').textContent = data.authorize.loginid;
+          document.getElementById('accountModeLabel').textContent = data.authorize.is_virtual ? 'حساب Deriv تجريبي' : 'حساب Deriv حقيقي';
+          updateStats();
+          showApp();
+        }
+
+        if (data.msg_type === 'tick' && data.tick) {
+          const sym = data.tick.symbol;
+          const q = parseFloat(data.tick.quote);
+          const item = ASSETS.find(x => x.symbol === sym);
+          if (item) item.price = q;
+          if (sym === currentSymbol) handleTick(q);
+          renderMarkets();
+        }
+
+        if (data.msg_type === 'buy' && data.buy) {
+          balance = parseFloat(data.buy.balance_after);
+          updateStats();
+          ws.send(JSON.stringify({ proposal_open_contract: 1, contract_id: data.buy.contract_id, subscribe: 1 }));
+        }
+
+        if (data.msg_type === 'proposal_open_contract' && data.proposal_open_contract && data.proposal_open_contract.is_sold) {
+          const poc = data.proposal_open_contract;
+          const profit = parseFloat(poc.profit);
+          balance += parseFloat(poc.sell_price);
+          updateStats();
+          addTradeLog(poc.underlying, poc.contract_type === 'CALL' ? 'شراء (CALL)' : 'بيع (PUT)', profit);
+        }
+      };
+
+      ws.onerror = () => {
+        document.getElementById('connLabel').textContent = '● وضع المحاكاة الحية';
+        document.getElementById('connLabel').style.color = 'var(--gold)';
+      };
     }
 
-    function changePair() {
-      currentPair = document.getElementById('pairSelect').value;
-      price = basePrices[currentPair];
-      historyPoints = Array.from({ length: 30 }, () => price);
-      updateLabels();
+    function loginWithToken() {
+      const t = document.getElementById('derivTokenInput').value.trim();
+      if (!t) {
+        document.getElementById('authError').style.display = 'block';
+        document.getElementById('authError').textContent = 'أدخل Deriv API Token أولاً أو استخدم الدخول الفوري.';
+        return;
+      }
+      localStorage.setItem('cyberbot_v6_token', t);
+      connectDerivWS(t);
     }
 
-    function updateLabels() {
-      const tf = document.getElementById('tfSelect').value;
-      document.getElementById('activePairTitle').textContent = currentPair;
-      document.getElementById('activeTfTitle').textContent = 'فريم ' + tf;
+    function loginQuickMode() {
+      isAuthorized = false;
+      connectDerivWS('');
+      showApp();
     }
 
-    function toggleBot() {
-      botRunning = !botRunning;
-      const btn = document.getElementById('toggleBotBtn');
-      const pill = document.getElementById('botStatusPill');
-      if (botRunning) {
-        btn.textContent = '⏹ إيقاف التداول الآلي';
-        btn.className = 'btn btn-stop';
-        pill.textContent = 'يعمل الآن';
-        pill.className = 'status-pill active';
+    function showApp() {
+      document.getElementById('authScreen').style.display = 'none';
+      document.getElementById('appShell').style.display = 'block';
+      selectSymbol('R_100');
+      renderNews();
+      renderMarkets();
+      evaluateMarketAndNews();
+    }
+
+    function logoutSession() {
+      localStorage.removeItem('cyberbot_v6_token');
+      location.reload();
+    }
+
+    function handleTick(quote) {
+      const asset = ASSETS.find(a => a.symbol === currentSymbol);
+      const dec = asset ? asset.dec : 2;
+      priceHistory.push(quote);
+      if (priceHistory.length > 60) priceHistory.shift();
+
+      if (candles.length === 0 || priceHistory.length % 4 === 0) {
+        const open = candles.length ? candles[candles.length - 1].c : quote;
+        candles.push({ o: open, h: quote, l: quote, c: quote });
+        if (candles.length > 28) candles.shift();
       } else {
-        btn.textContent = '▶ تشغيل التداول الآلي الآن';
-        btn.className = 'btn btn-start';
-        pill.textContent = 'متوقف';
-        pill.className = 'status-pill';
+        const c = candles[candles.length - 1];
+        c.c = quote;
+        if (quote > c.h) c.h = quote;
+        if (quote < c.l) c.l = quote;
+      }
+
+      document.getElementById('chartPrice').textContent = quote.toFixed(dec);
+      const pct = (((quote - asset.prev) / asset.prev) * 100).toFixed(2);
+      const chgEl = document.getElementById('chartChange');
+      chgEl.textContent = (pct >= 0 ? '+' : '') + pct + '%';
+      chgEl.className = pct >= 0 ? 'green' : 'red';
+
+      evaluateMarketAndNews();
+      drawCandles();
+    }
+
+    function evaluateMarketAndNews() {
+      const hasBreakingNews = newsEvents.some(n => n.activeAlert && n.impact === 'high');
+      const shieldOn = document.getElementById('newsShieldSwitch') ? document.getElementById('newsShieldSwitch').checked : true;
+
+      // حساب المؤشرات
+      const s9 = priceHistory.slice(-9);
+      const s21 = priceHistory.slice(-21);
+      const ema9 = s9.length ? s9.reduce((a, b) => a + b, 0) / s9.length : 0;
+      const ema21 = s21.length ? s21.reduce((a, b) => a + b, 0) / s21.length : 0;
+
+      let gains = 0, losses = 0;
+      for (let i = 1; i < s9.length; i++) {
+        const d = s9[i] - s9[i - 1];
+        if (d >= 0) gains += d; else losses -= d;
+      }
+      const rsi = s9.length > 1 ? 100 - (100 / (1 + (losses === 0 ? 100 : gains / losses))) : 50;
+
+      if (document.getElementById('indEma')) {
+        document.getElementById('indEma').textContent = `${ema9.toFixed(2)} / ${ema21.toFixed(2)}`;
+        document.getElementById('indRsi').textContent = rsi.toFixed(1);
+        document.getElementById('indVol').textContent = hasBreakingNews ? 'تذبذب خبري مرتفع!' : 'مستقر';
+      }
+
+      const box = document.getElementById('signalBox');
+      const title = document.getElementById('signalTitle');
+      const reason = document.getElementById('signalReason');
+      const newsBadge = document.getElementById('homeNewsStatus');
+
+      if (hasBreakingNews && shieldOn) {
+        newsPausedBot = true;
+        if (newsBadge) { newsBadge.textContent = 'خبر عاجل!'; newsBadge.className = 'red'; }
+        box.className = 'signal-panel pause';
+        title.style.color = 'var(--gold)';
+        title.textContent = '⚠️ تنبيه خبري: تم تعليق الدخول الآلي';
+        reason.textContent = 'درع الأخبار نشط لحماية الحساب من حركة الخبر العاجل';
+        return 'HOLD';
+      }
+
+      newsPausedBot = false;
+      if (newsBadge) { newsBadge.textContent = 'مراقبة نشطة'; newsBadge.className = 'green'; }
+
+      const isBuy = ema9 >= ema21 && rsi < 74;
+      if (isBuy) {
+        box.className = 'signal-panel';
+        title.style.color = 'var(--green)';
+        title.textContent = 'شراء قوي (CALL / BUY) ▲';
+        reason.textContent = `EMA9 (${ema9.toFixed(2)}) فوق EMA21 • RSI (${rsi.toFixed(1)})`;
+        return 'BUY';
+      } else {
+        box.className = 'signal-panel sell';
+        title.style.color = 'var(--red)';
+        title.textContent = 'بيع قوي (PUT / SELL) ▼';
+        reason.textContent = `ضغط بيعي / تشبع • RSI (${rsi.toFixed(1)})`;
+        return 'SELL';
       }
     }
 
-    function drawChart() {
-      const canvas = document.getElementById('chartCanvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const min = Math.min(...historyPoints);
-      const max = Math.max(...historyPoints) || min + 1;
-      const range = max - min || 1;
-
-      ctx.beginPath();
-      historyPoints.forEach((p, idx) => {
-        const x = (idx / (historyPoints.length - 1)) * canvas.width;
-        const y = canvas.height - ((p - min) / range) * (canvas.height - 24) - 12;
-        if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      });
-      ctx.strokeStyle = '#00f0ff';
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
+    function simulateBreakingNews() {
+      const alerts = [
+        { title: 'خبر عاجل: صدور بيانات الفيدرالي والتضخم بمفاجأة سعرية قوية!', impact: 'high', currency: 'USD / XAU' },
+        { title: 'تنبيه السوق: قفزة مفاجئة في أحجام التداول والسيولة اللحظية', impact: 'high', currency: 'ALL PAIRS' },
+        { title: 'تحديث اقتصادي: قرارات الفائدة وتوقعات الأسواق للفترة القادمة', impact: 'high', currency: 'EUR / USD' }
+      ];
+      const pick = alerts[Math.floor(Math.random() * alerts.length)];
+      const newEvt = {
+        id: Date.now(),
+        title: pick.title,
+        impact: pick.impact,
+        currency: pick.currency,
+        time: new Date().toLocaleTimeString('ar-EG'),
+        activeAlert: true
+      };
+      newsEvents.unshift(newEvt);
+      document.getElementById('tickerHeadline').textContent = `🚨 ${newEvt.title} (${newEvt.currency})`;
+      renderNews();
+      evaluateMarketAndNews();
     }
 
-    function addSimulatedTrade(type) {
-      const lot = parseFloat(document.getElementById('lotInput').value) || 0.05;
-      const isWin = Math.random() > 0.35;
-      const pnl = isWin ? +(lot * 180 * (0.6 + Math.random())).toFixed(2) : -(lot * 110 * (0.5 + Math.random())).toFixed(2);
-      balance += pnl;
-      totalProfit += pnl;
-      if (isWin) wins++;
+    function renderNews() {
+      document.getElementById('newsCountBadge').textContent = newsEvents.length + ' أحداث';
+      document.getElementById('tickerHeadline').textContent = newsEvents[0].title;
+      document.getElementById('newsFeedList').innerHTML = newsEvents.map(n => `
+        <div class="news-card">
+          <div class="news-top">
+            <span class="cyan" style="font-weight:800;">${n.currency} • ${n.time}</span>
+            <span class="${n.impact === 'high' ? 'impact-high' : 'impact-med'}">${n.impact === 'high' ? 'تأثير عالٍ' : 'متوسط'}</span>
+          </div>
+          <div style="font-size:13px; font-weight:700; line-height:1.5;">${n.title}</div>
+        </div>
+      `).join('');
+    }
 
-      trades.unshift({ pair: currentPair, type, pnl, time: new Date().toLocaleTimeString('ar-EG') });
-      document.getElementById('balanceVal').textContent = '$' + balance.toFixed(2);
-      const pEl = document.getElementById('profitVal');
-      pEl.textContent = (totalProfit >= 0 ? '+$' : '-$') + Math.abs(totalProfit).toFixed(2);
-      pEl.className = totalProfit >= 0 ? 'green' : 'red';
-      document.getElementById('winRateVal').textContent = Math.round((wins / trades.length) * 100) + '%';
-      document.getElementById('tradeCount').textContent = trades.length + ' صفقة';
+    function drawCandles() {
+      const canvas = document.getElementById('chartCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.clientWidth || 340;
+      canvas.height = canvas.clientHeight || 215;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      document.getElementById('tradesList').innerHTML = trades.slice(0, 20).map(t => `
-        <div class="trade-item ${t.pnl < 0 ? 'loss' : ''}">
+      if (candles.length < 2) return;
+      const maxP = Math.max(...candles.map(c => c.h));
+      const minP = Math.min(...candles.map(c => c.l));
+      const range = (maxP - minP) || 1;
+      const pad = 18;
+      const stepW = (canvas.width - 20) / candles.length;
+
+      candles.forEach((c, i) => {
+        const x = 10 + i * stepW + stepW * 0.2;
+        const cw = Math.max(4, stepW * 0.6);
+        const yH = canvas.height - pad - ((c.h - minP) / range) * (canvas.height - pad * 2);
+        const yL = canvas.height - pad - ((c.l - minP) / range) * (canvas.height - pad * 2);
+        const yO = canvas.height - pad - ((c.o - minP) / range) * (canvas.height - pad * 2);
+        const yC = canvas.height - pad - ((c.c - minP) / range) * (canvas.height - pad * 2);
+
+        const bull = c.c >= c.o;
+        ctx.strokeStyle = bull ? '#00e676' : '#ff3b5c';
+        ctx.fillStyle = bull ? '#00e676' : '#ff3b5c';
+
+        ctx.beginPath();
+        ctx.moveTo(x + cw / 2, yH);
+        ctx.lineTo(x + cw / 2, yL);
+        ctx.stroke();
+
+        ctx.fillRect(x, Math.min(yO, yC), cw, Math.max(3, Math.abs(yC - yO)));
+      });
+    }
+
+    function manualTrade(side) {
+      const stake = parseFloat(document.getElementById('stakeInput').value) || 10;
+      const ticks = parseInt(document.getElementById('ticksInput').value) || 5;
+
+      // فحص حدود الربح والخسارة اليومية
+      const maxLoss = parseFloat(document.getElementById('dailyLossInput').value) || 150;
+      const maxProfit = parseFloat(document.getElementById('dailyProfitInput').value) || 300;
+      const net = balance - startBalance;
+      if (net <= -maxLoss || net >= maxProfit) {
+        if (botRunning) toggleBot();
+        alert('تم الوصول إلى حد الحماية اليومي المحدد في إدارة المخاطر.');
+        return;
+      }
+
+      if (isAuthorized && ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          buy: 1,
+          price: stake,
+          parameters: {
+            amount: stake,
+            basis: 'stake',
+            contract_type: side === 'BUY' ? 'CALL' : 'PUT',
+            currency: 'USD',
+            duration: ticks,
+            duration_unit: 't',
+            symbol: currentSymbol
+          }
+        }));
+      } else {
+        const win = Math.random() > 0.35;
+        const pnl = win ? +(stake * 0.88).toFixed(2) : -stake;
+        balance += pnl;
+        updateStats();
+        addTradeLog(currentSymbol, side === 'BUY' ? 'شراء (CALL)' : 'بيع (PUT)', pnl);
+      }
+    }
+
+    function addTradeLog(sym, type, pnl) {
+      trades.unshift({ sym, type, pnl, time: new Date().toLocaleTimeString('ar-EG') });
+      const wins = trades.filter(t => t.pnl > 0).length;
+      const rate = Math.round((wins / trades.length) * 100) + '%';
+
+      document.getElementById('homeWinRate').textContent = rate;
+      document.getElementById('homeTradesCount').textContent = trades.length;
+      document.getElementById('historyCountLabel').textContent = trades.length + ' صفقة';
+
+      document.getElementById('historyList').innerHTML = trades.slice(0, 30).map(t => `
+        <div class="trade-row ${t.pnl < 0 ? 'loss' : ''}">
           <div>
-            <strong>${t.pair} • ${t.type}</strong>
+            <strong>${t.sym} • ${t.type}</strong>
             <div style="font-size:11px; color:var(--muted);">${t.time}</div>
           </div>
           <strong class="${t.pnl >= 0 ? 'green' : 'red'}">${t.pnl >= 0 ? '+' : ''}$${t.pnl.toFixed(2)}</strong>
@@ -508,72 +827,114 @@
       `).join('');
     }
 
-    function changeImage(event, target) {
-      const file = event.target.files[0];
+    function updateStats() {
+      document.getElementById('balanceDisplay').textContent = '$' + balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const diff = balance - startBalance;
+      const pct = ((diff / startBalance) * 100).toFixed(2);
+      const el = document.getElementById('pnlDisplay');
+      el.textContent = `صافي الربح: ${diff >= 0 ? '+$' : '-$'}${Math.abs(diff).toFixed(2)} (${pct}%)`;
+      el.className = diff >= 0 ? 'green' : 'red';
+    }
+
+    function toggleBot() {
+      botRunning = !botRunning;
+      const pill = document.getElementById('botPill');
+      const btn = document.getElementById('toggleBotBtn');
+      if (botRunning) {
+        pill.textContent = 'يعمل الآن';
+        pill.className = 'bot-status-pill active';
+        btn.textContent = '⏹ إيقاف الروبوت الذكي';
+        btn.style.background = 'linear-gradient(135deg, #d50000, #ff3b5c)';
+      } else {
+        pill.textContent = 'متوقف';
+        pill.className = 'bot-status-pill';
+        btn.textContent = '▶ تشغيل الروبوت الذكي';
+        btn.style.background = 'linear-gradient(135deg, #00e5ff 0%, #2979ff 52%, #7c3aed 100%)';
+      }
+    }
+
+    function selectSymbol(sym) {
+      currentSymbol = sym;
+      const a = ASSETS.find(x => x.symbol === sym);
+      priceHistory = [a.price];
+      candles = [];
+      document.getElementById('homeAssetTag').textContent = sym;
+      document.getElementById('chartTitle').textContent = a.name;
+      document.getElementById('chartPrice').textContent = a.price.toFixed(a.dec);
+    }
+
+    function renderMarkets() {
+      const rowHtml = (a) => {
+        const chg = (((a.price - a.prev) / a.prev) * 100).toFixed(2);
+        return `
+          <div class="market-item" onclick="selectSymbol('${a.symbol}'); switchPage('markets', document.querySelectorAll('.nav-btn')[1]);">
+            <div>
+              <strong style="font-size:14px;">${a.symbol.replace('frx','').replace('cry','')}</strong>
+              <div style="font-size:11px; color:var(--muted);">${a.name}</div>
+            </div>
+            <div style="text-align:left;">
+              <div style="font-weight:800; font-size:14px; direction:ltr;">${a.price.toFixed(a.dec)}</div>
+              <div class="${chg >= 0 ? 'green' : 'red'}" style="font-size:11px; font-weight:700;">${chg >= 0 ? '+' : ''}${chg}%</div>
+            </div>
+          </div>`;
+      };
+      document.getElementById('homeMarketsList').innerHTML = ASSETS.slice(0, 4).map(rowHtml).join('');
+      const list = currentCat === 'all' ? ASSETS : ASSETS.filter(a => a.cat === currentCat);
+      document.getElementById('marketsListFull').innerHTML = list.map(rowHtml).join('');
+    }
+
+    function setCategory(cat, btn) {
+      currentCat = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMarkets();
+    }
+
+    function changeTf(tf, btn) {
+      document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      drawCandles();
+    }
+
+    function switchPage(id, navEl) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      if (navEl) {
+        document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+        navEl.classList.add('active');
+      }
+      if (id === 'markets') drawCandles();
+    }
+
+    function changeCustomBg(e) {
+      const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(e) {
-        const dataUrl = e.target.result;
-        if (target === 'icon') {
-          document.getElementById('brandIcon').src = dataUrl;
-          document.getElementById('appFavicon').href = dataUrl;
-          localStorage.setItem('cyberbot_icon', dataUrl);
-        } else {
-          document.body.style.backgroundImage = `linear-gradient(rgba(7,9,18,0.72), rgba(7,9,18,0.88)), url('${dataUrl}')`;
-          localStorage.setItem('cyberbot_bg', dataUrl);
-        }
+      reader.onload = (ev) => {
+        document.body.style.backgroundImage = `linear-gradient(180deg, rgba(3,6,15,0.78), rgba(3,6,15,0.92)), url('${ev.target.result}')`;
+        document.body.style.backgroundSize = 'cover';
       };
       reader.readAsDataURL(file);
     }
 
-    function resetTheme() {
-      localStorage.removeItem('cyberbot_icon');
-      localStorage.removeItem('cyberbot_bg');
-      document.getElementById('brandIcon').src = 'icon.png';
-      document.body.style.backgroundImage = "linear-gradient(rgba(7,9,18,0.72), rgba(7,9,18,0.88)), url('bg.png')";
-    }
-
-    function saveSettings(notify = false) {
-      const broker = document.getElementById('brokerSelect').value;
-      document.getElementById('brokerTag').textContent = broker;
-      localStorage.setItem('cyberbot_broker', broker);
-      localStorage.setItem('cyberbot_lot', document.getElementById('lotInput').value);
-      if (notify) alert('تم حفظ الإعدادات بنجاح');
-    }
-
-    // استعادة الصور والإعدادات المحفوظة
-    window.onload = () => {
-      const savedIcon = localStorage.getItem('cyberbot_icon');
-      const savedBg = localStorage.getItem('cyberbot_bg');
-      if (savedIcon) document.getElementById('brandIcon').src = savedIcon;
-      if (savedBg) document.body.style.backgroundImage = `linear-gradient(rgba(7,9,18,0.72), rgba(7,9,18,0.88)), url('${savedBg}')`;
-      drawChart();
-    };
-
-    // تحديث حي للسعر والمؤشرات كل ثانيتين
-    let tickCount = 0;
+    // نبض التحديث والمراقبة الآلية كل 7 ثوانٍ
     setInterval(() => {
-      const step = currentPair === 'EURUSD' ? 0.0005 : (currentPair === 'BTCUSD' ? 45 : 1.2);
-      price += (Math.random() - 0.49) * step;
-      historyPoints.push(price);
-      if (historyPoints.length > 35) historyPoints.shift();
-
-      const decimals = currentPair === 'EURUSD' ? 4 : 2;
-      document.getElementById('livePrice').textContent = price.toFixed(decimals);
-      const rsi = (35 + Math.random() * 35).toFixed(1);
-      document.getElementById('rsiVal').textContent = rsi;
-      const isBuy = rsi < 55;
-      const sigEl = document.getElementById('aiSignal');
-      sigEl.textContent = isBuy ? 'تحليل الذكاء: شراء ▲' : 'تحليل الذكاء: بيع ▼';
-      sigEl.style.color = isBuy ? 'var(--green)' : 'var(--red)';
-      sigEl.style.borderColor = isBuy ? 'var(--green)' : 'var(--red)';
-
-      drawChart();
-      tickCount++;
-      if (botRunning && tickCount % 4 === 0) {
-        addSimulatedTrade(isBuy ? 'شراء (BUY)' : 'بيع (SELL)');
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        const a = ASSETS.find(x => x.symbol === currentSymbol);
+        a.price += (Math.random() - 0.495) * (a.price * 0.0007);
+        handleTick(a.price);
+        renderMarkets();
       }
-    }, 2000);
+      if (botRunning && !newsPausedBot) {
+        const sig = evaluateMarketAndNews();
+        if (sig === 'BUY' || sig === 'SELL') manualTrade(sig);
+      }
+    }, 7000);
+
+    window.onload = () => {
+      const savedToken = localStorage.getItem('cyberbot_v6_token');
+      if (savedToken) document.getElementById('derivTokenInput').value = savedToken;
+    };
   </script>
 </body>
 </html>
