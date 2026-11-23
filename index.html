@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>CYBERBOT DERIV PRO</title>
+<style>
+  :root {
+    --bg-obsidian: #06070A;
+    --bg-slate: #0E1117;
+    --bg-card: #121722;
+    --cyan: #00F5FF;
+    --purple: #9D4EDD;
+    --gold: #FFD700;
+    --emerald: #00E676;
+    --crimson: #FF1744;
+    --text-main: #F1F5F9;
+    --text-dim: #94A3B8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  body { background: var(--bg-obsidian); color: var(--text-main); min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+
+  #splash-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: radial-gradient(circle at center, #101628 0%, #06070A 80%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px; transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  #splash-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.65; }
+  .splash-content {
+    position: relative; z-index: 2; width: 100%; max-width: 380px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center;
+  }
+  .ai-core {
+    width: 96px; height: 96px; border-radius: 50%; border: 2px solid var(--cyan);
+    box-shadow: 0 0 28px rgba(0,245,255,0.6), inset 0 0 22px rgba(157,78,221,0.6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 900; color: var(--cyan);
+    animation: pulseCore 2s infinite ease-in-out; background: rgba(14,17,23,0.85);
+  }
+  @keyframes pulseCore {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 22px rgba(0,245,255,0.5); }
+    50% { transform: scale(1.07); box-shadow: 0 0 42px rgba(157,78,221,0.85); }
+  }
+  .splash-title {
+    font-size: 24px; font-weight: 900; letter-spacing: 1.5px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .splash-sub { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+  .pin-input {
+    width: 100%; padding: 14px; border-radius: 12px; text-align: center;
+    background: rgba(14,17,23,0.9); border: 1px solid rgba(0,245,255,0.35);
+    color: var(--cyan); font-size: 18px; letter-spacing: 6px; outline: none;
+  }
+
+  .app-shell {
+    width: 100%; max-width: 480px; margin: 0 auto;
+    padding: 14px 14px 40px 14px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .card {
+    background: var(--bg-slate); border: 1px solid rgba(0,245,255,0.18);
+    border-radius: 16px; padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--cyan); display: flex; justify-content: space-between; align-items: center;
+  }
+  .ar-tag { font-size: 12px; color: var(--gold); font-weight: 700; }
+  .v-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+
+  .btn {
+    width: 100%; padding: 15px 16px; border-radius: 12px;
+    font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
+    cursor: pointer; border: 1.5px solid transparent;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: transform 0.12s ease; color: #fff; background: var(--bg-card);
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-cyan { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 14px rgba(0,245,255,0.22); }
+  .btn-purple { border-color: var(--purple); color: #E0AAFF; box-shadow: 0 0 14px rgba(157,78,221,0.25); }
+  .btn-emerald { background: linear-gradient(135deg, #00B85C, #00E676); color: #04140B; border-color: var(--emerald); box-shadow: 0 0 20px rgba(0,230,118,0.4); }
+  .btn-crimson { background: linear-gradient(135deg, #C60F35, #FF1744); color: #fff; border-color: var(--crimson); box-shadow: 0 0 20px rgba(255,23,68,0.4); }
+  .btn-gold { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 14px rgba(255,215,0,0.22); }
+
+  label { font-size: 12px; color: var(--text-dim); font-weight: 600; display: block; margin-bottom: 5px; }
+  input, select {
+    width: 100%; padding: 13px 14px; border-radius: 10px;
+    background: var(--bg-obsidian); border: 1px solid rgba(148,163,184,0.25);
+    color: var(--text-main); font-size: 15px; outline: none;
+  }
+  input:focus, select:focus { border-color: var(--cyan); }
+
+  .status-pill { padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 800; display: flex; justify-content: space-between; }
+  .status-on { background: rgba(0,230,118,0.12); border: 1px solid var(--emerald); color: var(--emerald); }
+  .status-off { background: rgba(255,23,68,0.12); border: 1px solid var(--crimson); color: var(--crimson); }
+
+  .balance-box {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--bg-obsidian); padding: 12px 14px; border-radius: 12px;
+    border: 1px solid rgba(255,215,0,0.25);
+  }
+  .balance-val { font-size: 22px; font-weight: 900; color: var(--gold); }
+  .ticker-row { display: flex; justify-content: space-between; align-items: baseline; }
+  .live-price { font-size: 28px; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .pct-badge { font-size: 13px; font-weight: 800; padding: 4px 10px; border-radius: 8px; }
+  .up { color: var(--emerald); }
+  .down { color: var(--crimson); }
+  #chart-canvas { width: 100%; height: 240px; border-radius: 12px; background: #05070B; border: 1px solid rgba(0,245,255,0.15); display: block; }
+
+  .meter-track { width: 100%; height: 14px; background: #06070A; border-radius: 99px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+  .meter-fill { height: 100%; width: 0%; transition: width 0.35s ease; background: linear-gradient(90deg, var(--purple), var(--cyan), var(--emerald)); }
+  .ai-badge { font-size: 16px; font-weight: 900; padding: 10px; border-radius: 10px; text-align: center; background: rgba(0,245,255,0.08); border: 1px solid var(--cyan); }
+  .meta-text { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .chip { padding: 10px 6px; border-radius: 8px; background: var(--bg-obsidian); border: 1px solid rgba(0,245,255,0.3); color: var(--cyan); font-weight: 700; font-size: 13px; text-align: center; cursor: pointer; }
+
+  .log-box { max-height: 180px; overflow-y: auto; background: var(--bg-obsidian); border-radius: 10px; padding: 10px; font-family: monospace; font-size: 11.5px; display: flex; flex-direction: column; gap: 6px; }
+  .log-INFO { color: var(--cyan); }
+  .log-SUCCESS { color: var(--emerald); }
+  .log-WARN { color: var(--gold); }
+  .log-ERROR { color: var(--crimson); }
+  .news-item { padding: 10px; border-radius: 10px; background: var(--bg-obsidian); border-left: 3px solid var(--crimson); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div id="splash-screen">
+  <canvas id="splash-canvas"></canvas>
+  <div class="splash-content">
+    <div class="ai-core">AI</div>
+    <div class="splash-title">CYBERBOT DERIV PRO</div>
+    <div class="splash-sub">Autonomous AI Trading & Market Intelligence<br/>منصة التداول الذكي المتكاملة مع Deriv API</div>
+    <input id="splash-pin" type="password" maxlength="6" class="pin-input" placeholder="PIN (Optional / اختياري)" />
+    <button class="btn btn-emerald" onclick="launchTerminal()">LAUNCH TERMINAL • دخول المنصة</button>
+  </div>
+</div>
+
+<div class="app-shell">
+  <div class="card">
+    <div class="card-title"><span>1. DERIV API & SECURITY</span><span class="ar-tag">الاتصال والأمان</span></div>
+    <div id="conn-status" class="status-pill status-off"><span>● DISCONNECTED</span><span id="acc-id">ID: ---</span></div>
+    <div class="balance-box">
+      <div><div style="font-size:11px;color:var(--text-dim);">LIVE BALANCE • الرصيد</div><div id="acc-balance" class="balance-val">0.00 USD</div></div>
+      <div style="text-align:right;"><div style="font-size:11px;color:var(--text-dim);">DAILY PNL</div><div id="daily-pnl" style="font-size:16px;font-weight:900;color:var(--emerald);">+0.00</div></div>
+    </div>
+    <div class="v-stack">
+      <div><label>Deriv API Token • مفتاح Deriv API</label><input id="api-token" type="password" placeholder="Paste your Deriv API Token..." /></div>
+      <button class="btn btn-purple" onclick="toggleTokenVisibility()">Show / Hide Token • إظهار / إخفاء المفتاح</button>
+      <div>
+        <label>Account Mode • نوع الحساب</label>
+        <select id="acc-mode">
+          <option value="demo">Demo Account • حساب تجريبي</option>
+          <option value="real">Real Account • حساب حقيقي</option>
+        </select>
+      </div>
+      <button class="btn btn-cyan" onclick="connectDeriv()">CONNECT TO DERIV WS • اتصال بالمنصة</button>
+      <button class="btn btn-crimson" onclick="wipeAndDisconnect()">DISCONNECT & WIPE TOKEN • قطع الاتصال ومسح المفتاح</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>2. LIVE CHART & MARKET</span><span class="ar-tag">الشارت والأسعار المباشرة</span></div>
+    <div class="ticker-row"><div id="live-price" class="live-price">---</div><div id="live-pct" class="pct-badge">0.00%</div></div>
+    <canvas id="chart-canvas" width="440" height="240"></canvas>
+    <div class="v-stack">
+      <div>
+        <label>Market Pair / Synthetic Index • الزوج / المؤشر</label>
+        <select id="asset-select" onchange="subscribeMarket()">
+          <option value="R_100">R_100 — Volatility 100 (24/7)</option>
+          <option value="R_75">R_75 — Volatility 75 (24/7)</option>
+          <option value="1HZ100V">1HZ100V — Volatility 100 (1s)</option>
+          <option value="frxXAUUSD">frxXAUUSD — Gold / USD</option>
+          <option value="frxEURUSD">frxEURUSD — EUR / USD</option>
+          <option value="frxGBPUSD">frxGBPUSD — GBP / USD</option>
+          <option value="cryBTCUSD">cryBTCUSD — Bitcoin / USD</option>
+        </select>
+      </div>
+      <div>
+        <label>Timeframe • الفريم الزمني</label>
+        <select id="tf-select" onchange="subscribeMarket()">
+          <option value="60">1 Minute (1m)</option>
+          <option value="300">5 Minutes (5m)</option>
+          <option value="900">15 Minutes (15m)</option>
+          <option value="3600">1 Hour (1h)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>3. AI MARKET INTELLIGENCE</span><span class="ar-tag">محرك التحليل والشموع</span></div>
+    <div id="ai-signal-box" class="ai-badge">SIGNAL: WAITING FOR DATA...</div>
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+        <span>AI Confidence Meter • قوة الإشارة</span><span id="ai-conf-val" style="color:var(--cyan);font-weight:800;">0%</span>
+      </div>
+      <div class="meter-track"><div id="ai-meter-fill" class="meter-fill"></div></div>
+    </div>
+    <div id="ai-rationale" class="meta-text">Analyzing OHLC candlesticks, EMA 9/21/200, RSI 14, MACD, Bollinger Bands & Market Structure...</div>
+    <div id="ai-metrics" class="meta-text" style="color:var(--gold);">RSI: -- | MACD: -- | ATR: -- | Regime: --</div>
+    <div id="ai-uncertainty" class="meta-text" style="color:#E0AAFF;">Uncertainty: --</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>4. AUTO-TRADING & RISK</span><span class="ar-tag">التداول التلقائي وإدارة المخاطر</span></div>
+    <div class="v-stack">
+      <div><label>Stake Amount (Min 0.01) • مبلغ الصفقة</label><input id="stake-input" type="number" step="0.01" min="0.01" value="1.00" /></div>
+      <div class="quick-grid">
+        <div class="chip" onclick="setStake(0.01)">0.01</div>
+        <div class="chip" onclick="setStake(0.10)">0.10</div>
+        <div class="chip" onclick="setStake(0.50)">0.50</div>
+        <div class="chip" onclick="setStake(1.00)">1.00</div>
+        <div class="chip" onclick="setStake(5.00)">5.00</div>
+        <div class="chip" onclick="setStake(10.00)">10.00</div>
+      </div>
+      <div>
+        <label>Contract Type • نوع العقد</label>
+        <select id="contract-type">
+          <option value="CALL">Rise / Fall (CALL / PUT)</option>
+          <option value="MULT">Multipliers (MULTUP / MULTDOWN)</option>
+        </select>
+      </div>
+      <div><label>Stop Loss (USD) • وقف الخسارة</label><input id="sl-input" type="number" step="0.5" value="5.0" /></div>
+      <div><label>Take Profit (USD) • جني الأرباح</label><input id="tp-input" type="number" step="0.5" value="10.0" /></div>
+      <div><label>Daily Max Loss Limit (USD) • حد الخسارة اليومي</label><input id="max-loss-input" type="number" step="1" value="25.0" /></div>
+      <div><label>Min AI Confidence (%) • أقل نسبة ثقة للتنفيذ</label><input id="conf-thresh" type="number" min="50" max="95" value="70" /></div>
+      <button class="btn btn-emerald" onclick="startAutoTrade()">START AUTO-TRADING • تشغيل التداول التلقائي</button>
+      <button class="btn btn-crimson" onclick="emergencyStop()">EMERGENCY STOP • إيقاف فوري</button>
+      <button class="btn btn-cyan" onclick="executeTrade('BUY')">MANUAL BUY / CALL • شراء يدوي</button>
+      <button class="btn btn-gold" onclick="executeTrade('SELL')">MANUAL SELL / PUT • بيع يدوي</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>5. ECONOMIC NEWS GUARD</span><span class="ar-tag">فلتر الأخبار الاقتصادية</span></div>
+    <button id="news-guard-btn" class="btn btn-purple" onclick="toggleNewsGuard()">NEWS GUARD: ACTIVE • حماية الأخبار مفعّلة</button>
+    <div id="news-list" class="v-stack">
+      <div class="news-item"><strong>[HIGH] USD — 12:30 UTC</strong><br/>US CPI Inflation & Core CPI Release</div>
+      <div class="news-item"><strong>[HIGH] USD — 13:30 UTC</strong><br/>Non-Farm Payrolls (NFP) & Unemployment</div>
+      <div class="news-item"><strong>[HIGH] USD — 18:00 UTC</strong><br/>FOMC Federal Reserve Rate Decision</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>6. TRADE LOGS & HISTORY</span><span class="ar-tag">سجل الصفقات والنظام</span></div>
+    <div id="trade-history" class="log-box">No trades executed yet.</div>
+    <div id="sys-logs" class="log-box"></div>
+  </div>
+</div>
+
+<script>
+const DERIV_WS_URL = "wss://ws.derivws.com/websockets/v3?app_id=1089";
+let ws = null, authorized = false, autoTrade = false, newsGuardEnabled = true;
+let candles = [], open24h = 0, livePrice = 0, prevPrice = 0, dailyPnl = 0, lastTradeTs = 0;
+let accountInfo = { loginid: "---", balance: 0, currency: "USD" };
+let openTrades = {}, tradeHistory = [], lastAnalysis = null;
+
+// ==================== SPLASH ANIMATION ====================
+(function initSplash() {
+  const c = document.getElementById('splash-canvas'), ctx = c.getContext('2d');
+  let w, h;
+  function resize() { w = c.width = window.innerWidth; h = c.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const bars = Array.from({length: 24}, (_, i) => ({
+    x: (i / 24) * window.innerWidth, y: window.innerHeight * 0.5 + (Math.random() - 0.5) * 140,
+    h: 25 + Math.random() * 60, bull: Math.random() > 0.45, vy: (Math.random() - 0.5) * 0.8
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    bars.forEach(b => {
+      b.y += b.vy; if (b.y < 80 || b.y > h - 80) b.vy *= -1;
+      ctx.strokeStyle = b.bull ? 'rgba(0,230,118,0.65)' : 'rgba(255,23,68,0.65)';
+      ctx.fillStyle = b.bull ? 'rgba(0,230,118,0.35)' : 'rgba(255,23,68,0.35)';
+      ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(b.x + 6, b.y - 18); ctx.lineTo(b.x + 6, b.y + b.h + 18); ctx.stroke();
+      ctx.fillRect(b.x, b.y, 12, b.h);
+    });
+    if (!document.getElementById('splash-screen').classList.contains('hidden')) requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+function launchTerminal() { document.getElementById('splash-screen').classList.add('hidden'); }
+
+function log(msg, level = "INFO") {
+  const box = document.getElementById('sys-logs');
+  const d = document.createElement('div');
+  d.className = `log-${level}`;
+  d.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  box.prepend(d);
+}
+
+// ==================== AI MARKET INTELLIGENCE ENGINE ====================
+function calcEMA(vals, period) {
+  if (vals.length < period) return vals.map(() => null);
+  const k = 2 / (period + 1);
+  const ema = Array(period - 1).fill(null);
+  let sma = vals.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  ema.push(sma);
+  for (let i = period; i < vals.length; i++) ema.push(vals[i] * k + ema[ema.length - 1] * (1 - k));
+  return ema;
+}
+
+function calcRSI(closes, period = 14) {
+  if (closes.length < period + 1) return 50;
+  let gains = 0, losses = 0;
+  for (let i = 1; i <= period; i++) {
+    const diff = closes[i] - closes[i - 1];
+    if (diff > 0) gains += diff; else losses -= diff;
+  }
+  let avgG = gains / period, avgL = losses / period;
+  for (let i = period + 1; i < closes.length; i++) {
+    const diff = closes[i] - closes[i - 1];
+    avgG = (avgG * (period - 1) + Math.max(diff, 0)) / period;
+    avgL = (avgL * (period - 1) + Math.max(-diff, 0)) / period;
+  }
+  if (avgL === 0) return 100;
+  return +(100 - 100 / (1 + avgG / avgL)).toFixed(2);
+}
+
+function analyzeMarket(cs) {
+  if (cs.length < 25) return { signal: "WAIT", confidence: 0, rationale: "Collecting live candles...", indicators: { rsi: 50, macd: 0, atr: 0 }, structure: { regime: "Warming Up" }, uncertainty: "HIGH", ema_series: {} };
+  const closes = cs.map(c => c.close);
+  const ema9 = calcEMA(closes, 9), ema21 = calcEMA(closes, 21), ema200 = calcEMA(closes, Math.min(200, closes.length));
+  const rsi = calcRSI(closes, 14);
+  const ema12 = calcEMA(closes, 12), ema26 = calcEMA(closes, 26);
+  const macdHist = (ema12[ema12.length - 1] || 0) - (ema26[ema26.length - 1] || 0);
+
+  let trSum = 0;
+  for (let i = cs.length - 14; i < cs.length; i++) {
+    trSum += Math.max(cs[i].high - cs[i].low, Math.abs(cs[i].high - cs[i - 1].close), Math.abs(cs[i].low - cs[i - 1].close));
+  }
+  const atr = +(trSum / 14).toFixed(5);
+
+  let buy = 0, sell = 0, reasons = [];
+  const e9 = ema9[ema9.length - 1], e21 = ema21[ema21.length - 1];
+  if (e9 > e21) { buy += 22; reasons.push("EMA 9 > EMA 21"); } else { sell += 22; reasons.push("EMA 9 < EMA 21"); }
+  if (rsi <= 32) { buy += 25; reasons.push(`RSI Oversold (${rsi})`); }
+  else if (rsi >= 68) { sell += 25; reasons.push(`RSI Overbought (${rsi})`); }
+  if (macdHist > 0) { buy += 15; reasons.push("MACD Bullish"); } else { sell += 15; reasons.push("MACD Bearish"); }
+
+  // Candlestick Patterns (last closed candle)
+  const c1 = cs[cs.length - 3], c2 = cs[cs.length - 2];
+  const b2 = Math.abs(c2.close - c2.open), r2 = Math.max(c2.high - c2.low, 1e-9);
+  const lw = Math.min(c2.open, c2.close) - c2.low, uw = c2.high - Math.max(c2.open, c2.close);
+  if (c1.close < c1.open && c2.close > c2.open && c2.close >= c1.open) { buy += 22; reasons.push("Bullish Engulfing"); }
+  else if (c1.close > c1.open && c2.close < c2.open && c2.close <= c1.open) { sell += 22; reasons.push("Bearish Engulfing"); }
+  if (lw >= 2 * b2 && uw <= 0.3 * r2) { buy += 18; reasons.push("Bullish Hammer/Pin Bar"); }
+  else if (uw >= 2 * b2 && lw <= 0.3 * r2) { sell += 18; reasons.push("Bearish Shooting Star"); }
+
+  // Market Structure (BOS)
+  const recent = cs.slice(-12, -2);
+  const prevHigh = Math.max(...recent.map(x => x.high)), prevLow = Math.min(...recent.map(x => x.low));
+  let regime = "Ranging";
+  if (c2.close > prevHigh) { buy += 15; regime = "Trending Up (BOS)"; reasons.push("Bullish BOS"); }
+  else if (c2.close < prevLow) { sell += 15; regime = "Trending Down (BOS)"; reasons.push("Bearish BOS"); }
+
+  let signal = "NEUTRAL", confidence = Math.min(49, Math.max(buy, sell));
+  if (buy > sell && buy >= 45) { signal = "BUY"; confidence = Math.min(96, buy); }
+  else if (sell > buy && sell >= 45) { signal = "SELL"; confidence = Math.min(96, sell); }
+
+  const uncertainty = Math.abs(buy - sell) < 12 ? "HIGH — Conflicting signals" : "LOW-MODERATE — Aligned context";
+  return {
+    signal, confidence, rationale: reasons.slice(0, 4).join(" | "),
+    indicators: { rsi, macd: +macdHist.toFixed(4), atr },
+    structure: { regime }, uncertainty,
+    ema_series: { ema9: ema9.slice(-80), ema21: ema21.slice(-80), ema200: ema200.slice(-80) }
+  };
+}
+
+// ==================== DERIV WEBSOCKET CONNECTION ====================
+function sendDeriv(obj) { if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj)); }
+
+function connectDeriv() {
+  const token = document.getElementById('api-token').value.trim();
+  if (token) localStorage.setItem('deriv_token_enc', btoa(token));
+  if (ws) { ws.onclose = null; ws.close(); }
+
+  log("Connecting to Deriv WebSocket...");
+  ws = new WebSocket(DERIV_WS_URL);
+  ws.onopen = () => {
+    updateStatus(true, false);
+    if (token) sendDeriv({ authorize: token });
+    else subscribeMarket();
+  };
+  ws.onmessage = (ev) => handleDerivMsg(JSON.parse(ev.data));
+  ws.onclose = () => {
+    authorized = false; updateStatus(false, false);
+    log("Disconnected. Reconnecting in 4s...", "WARN");
+    setTimeout(connectDeriv, 4000);
+  };
+}
+
+function wipeAndDisconnect() {
+  autoTrade = false; authorized = false;
+  localStorage.removeItem('deriv_token_enc');
+  document.getElementById('api-token').value = '';
+  if (ws) { ws.onclose = null; ws.close(); }
+  updateStatus(false, false);
+  log("Token wiped & disconnected.", "WARN");
+}
+
+function subscribeMarket() {
+  const sym = document.getElementById('asset-select').value;
+  const gran = parseInt(document.getElementById('tf-select').value);
+  candles = [];
+  sendDeriv({ forget_all: ["candles", "ticks"] });
+  sendDeriv({ ticks_history: sym, adjust_start_time: 1, count: 100, end: "latest", granularity: gran, style: "candles", subscribe: 1 });
+  log(`Subscribed to ${sym} (${gran}s)`);
+}
+
+function handleDerivMsg(d) {
+  if (d.error) { log(`Deriv Error: ${d.error.message}`, "ERROR"); return; }
+  if (d.msg_type === "authorize") {
+    authorized = true;
+    accountInfo = { loginid: d.authorize.loginid, balance: +d.authorize.balance, currency: d.authorize.currency };
+    updateStatus(true, true);
+    log(`Authorized: ${accountInfo.loginid} (${accountInfo.balance} ${accountInfo.currency})`, "SUCCESS");
+    sendDeriv({ balance: 1, subscribe: 1 });
+    subscribeMarket();
+  } else if (d.msg_type === "balance") {
+    accountInfo.balance = +d.balance.balance;
+    document.getElementById('acc-balance').innerText = `${accountInfo.balance.toFixed(2)} ${accountInfo.currency}`;
+  } else if (d.msg_type === "candles") {
+    candles = d.candles.map(c => ({ epoch: +c.epoch, open: +c.open, high: +c.high, low: +c.low, close: +c.close }));
+    if (candles.length) { open24h = candles[0].open; livePrice = prevPrice = candles[candles.length - 1].close; updateUI(); }
+  } else if (d.msg_type === "ohlc") {
+    const o = d.ohlc, c = { epoch: +o.open_time, open: +o.open, high: +o.high, low: +o.low, close: +o.close };
+    prevPrice = livePrice; livePrice = c.close;
+    if (candles.length && candles[candles.length - 1].epoch === c.epoch) candles[candles.length - 1] = c;
+    else { candles.push(c); if (candles.length > 150) candles.shift(); }
+    updateUI();
+    if (autoTrade) evaluateAutoTrade();
+  } else if (d.msg_type === "buy") {
+    const cid = String(d.buy.contract_id);
+    const t = { id: cid, symbol: document.getElementById('asset-select').value, type: lastAnalysis?.signal || "BUY", stake: +document.getElementById('stake-input').value, status: "OPEN", pnl: 0, time: new Date().toLocaleTimeString() };
+    openTrades[cid] = t; tradeHistory.unshift(t); renderHistory();
+    log(`Trade Opened! ID: ${cid}`, "SUCCESS");
+    sendDeriv({ proposal_open_contract: 1, contract_id: +cid, subscribe: 1 });
+  } else if (d.msg_type === "proposal_open_contract") {
+    const poc = d.proposal_open_contract, cid = String(poc.contract_id);
+    if (openTrades[cid]) {
+      openTrades[cid].pnl = +(poc.profit || 0).toFixed(2);
+      if (poc.is_sold || poc.status === "won" || poc.status === "lost") {
+        openTrades[cid].status = openTrades[cid].pnl >= 0 ? "WON" : "LOST";
+        dailyPnl = +(dailyPnl + openTrades[cid].pnl).toFixed(2);
+        delete openTrades[cid];
+        const pnlEl = document.getElementById('daily-pnl');
+        pnlEl.innerText = `${dailyPnl >= 0 ? '+' : ''}${dailyPnl.toFixed(2)}`;
+        pnlEl.style.color = dailyPnl >= 0 ? 'var(--emerald)' : 'var(--crimson)';
+        log(`Trade Closed (${cid}) | PnL: ${poc.profit}`, poc.profit >= 0 ? "SUCCESS" : "WARN");
+      }
+      renderHistory();
+    }
+  }
+}
+
+function evaluateAutoTrade() {
+  const maxLoss = Math.abs(+document.getElementById('max-loss-input').value || 25);
+  if (dailyPnl <= -maxLoss) { autoTrade = false; log("DAILY MAX LOSS HIT! Auto-Trade Stopped.", "ERROR"); return; }
+  if (Object.keys(openTrades).length >= 2 || Date.now() - lastTradeTs < 15000) return;
+  const thresh = +document.getElementById('conf-thresh').value || 70;
+  if (lastAnalysis && (lastAnalysis.signal === "BUY" || lastAnalysis.signal === "SELL") && lastAnalysis.confidence >= thresh) {
+    executeTrade(lastAnalysis.signal);
+  }
+}
+
+function executeTrade(dir) {
+  if (!authorized) { log("Please connect a valid Deriv API Token first.", "WARN"); return; }
+  lastTradeTs = Date.now();
+  const stake = Math.max(0.01, +document.getElementById('stake-input').value || 1);
+  const sym = document.getElementById('asset-select').value;
+  const mode = document.getElementById('contract-type').value;
+  const params = mode === "MULT" ? {
+    amount: stake, basis: "stake", contract_type: dir === "BUY" ? "MULTUP" : "MULTDOWN",
+    currency: accountInfo.currency, multiplier: 100, symbol: sym,
+    limit_order: { stop_loss: +document.getElementById('sl-input').value || 5, take_profit: +document.getElementById('tp-input').value || 10 }
+  } : {
+    amount: stake, basis: "stake", contract_type: dir === "BUY" ? "CALL" : "PUT",
+    currency: accountInfo.currency, duration: 5, duration_unit: "t", symbol: sym
+  };
+  sendDeriv({ buy: 1, price: stake, parameters: params });
+  log(`Sending ${params.contract_type} on ${sym} (Stake: ${stake})...`);
+}
+
+function updateStatus(conn, auth) {
+  const pill = document.getElementById('conn-status');
+  pill.className = 'status-pill ' + (conn ? 'status-on' : 'status-off');
+  pill.firstElementChild.innerText = conn ? (auth ? '● CONNECTED TO DERIV WS' : '● MARKET FEED ONLY') : '● DISCONNECTED';
+  document.getElementById('acc-id').innerText = 'ID: ' + accountInfo.loginid;
+  document.getElementById('acc-balance').innerText = `${accountInfo.balance.toFixed(2)} ${accountInfo.currency}`;
+}
+
+function updateUI() {
+  const pEl = document.getElementById('live-price');
+  pEl.innerText = livePrice.toFixed(livePrice < 10 ? 5 : 2);
+  pEl.className = 'live-price ' + (livePrice >= prevPrice ? 'up' : 'down');
+  const pct = open24h ? ((livePrice - open24h) / open24h * 100).toFixed(3) : "0.000";
+  const pctEl = document.getElementById('live-pct');
+  pctEl.innerText = `${pct >= 0 ? '+' : ''}${pct}%`;
+  pctEl.className = 'pct-badge ' + (pct >= 0 ? 'up' : 'down');
+
+  lastAnalysis = analyzeMarket(candles);
+  drawCandles(candles.slice(-80), lastAnalysis.ema_series);
+
+  const a = lastAnalysis, sigBox = document.getElementById('ai-signal-box');
+  sigBox.innerText = `AI SIGNAL: ${a.signal} (${a.confidence}%)`;
+  sigBox.style.color = sigBox.style.borderColor = a.signal === 'BUY' ? 'var(--emerald)' : (a.signal === 'SELL' ? 'var(--crimson)' : 'var(--cyan)');
+  document.getElementById('ai-conf-val').innerText = `${a.confidence}%`;
+  document.getElementById('ai-meter-fill').style.width = `${a.confidence}%`;
+  document.getElementById('ai-rationale').innerText = a.rationale;
+  document.getElementById('ai-metrics').innerText = `RSI: ${a.indicators.rsi} | MACD: ${a.indicators.macd} | ATR: ${a.indicators.atr} | ${a.structure.regime}`;
+  document.getElementById('ai-uncertainty').innerText = `Uncertainty: ${a.uncertainty}`;
+}
+
+function drawCandles(cs, emas) {
+  const canvas = document.getElementById('chart-canvas'), ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  if (cs.length < 2) return;
+  let minP = Infinity, maxP = -Infinity;
+  cs.forEach(c => { if (c.low < minP) minP = c.low; if (c.high > maxP) maxP = c.high; });
+  const pad = (maxP - minP) * 0.1 || 1; minP -= pad; maxP += pad;
+  const toY = p => H - ((p - minP) / (maxP - minP)) * (H - 20) - 10;
+  const step = W / cs.length, cw = Math.max(2, step * 0.65);
+
+  cs.forEach((c, i) => {
+    const x = i * step + step / 2, bull = c.close >= c.open;
+    ctx.strokeStyle = ctx.fillStyle = bull ? '#00E676' : '#FF1744';
+    ctx.beginPath(); ctx.moveTo(x, toY(c.high)); ctx.lineTo(x, toY(c.low)); ctx.stroke();
+    ctx.fillRect(x - cw / 2, Math.min(toY(c.open), toY(c.close)), cw, Math.max(1.5, Math.abs(toY(c.close) - toY(c.open))));
+  });
+  function drawLine(arr, color) {
+    if (!arr || arr.length !== cs.length) return;
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.beginPath();
+    let s = false;
+    arr.forEach((v, i) => { if (v != null) { const x = i * step + step / 2, y = toY(v); if (!s) { ctx.moveTo(x, y); s = true; } else ctx.lineTo(x, y); } });
+    ctx.stroke();
+  }
+  if (emas) { drawLine(emas.ema9, '#00F5FF'); drawLine(emas.ema21, '#9D4EDD'); drawLine(emas.ema200, '#FFD700'); }
+}
+
+function renderHistory() {
+  document.getElementById('trade-history').innerHTML = tradeHistory.slice(0, 30).map(t =>
+    `<div class="${t.pnl >= 0 ? 'log-SUCCESS' : 'log-ERROR'}">[${t.time}] ${t.symbol} ${t.type} | Stake: ${t.stake} | ${t.status} (${t.pnl >= 0 ? '+' : ''}${t.pnl})</div>`
+  ).join('');
+}
+
+function toggleTokenVisibility() { const i = document.getElementById('api-token'); i.type = i.type === 'password' ? 'text' : 'password'; }
+function setStake(v) { document.getElementById('stake-input').value = v.toFixed(2); }
+function startAutoTrade() { autoTrade = true; log("AUTO-TRADING ENABLED", "SUCCESS"); }
+function emergencyStop() { autoTrade = false; log("EMERGENCY STOP: Auto-Trading Disabled", "WARN"); }
+function toggleNewsGuard() {
+  newsGuardEnabled = !newsGuardEnabled;
+  document.getElementById('news-guard-btn').innerText = newsGuardEnabled ? 'NEWS GUARD: ACTIVE • حماية الأخبار مفعّلة' : 'NEWS GUARD: OVERRIDDEN • الحماية متوقفة';
+}
+
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('deriv_token_enc');
+  if (saved) document.getElementById('api-token').value = atob(saved);
+  connectDeriv();
+});
+</script>
+</body>
+</html>
