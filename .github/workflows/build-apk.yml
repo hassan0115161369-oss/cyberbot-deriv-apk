@@ -31,16 +31,13 @@ jobs:
         run: |
           cordova create cyberbot_app com.hassan.cyberbotderiv "CyberBot Deriv Pro"
           cp index.html cyberbot_app/www/index.html
-          # نسخ أي أيقونات أو صور إن وجدت
           cp *.png cyberbot_app/www/ 2>/dev/null || true
           cp *.jpg cyberbot_app/www/ 2>/dev/null || true
           cp *.svg cyberbot_app/www/ 2>/dev/null || true
           cd cyberbot_app
 
-          # إضافة منصة أندرويد
           cordova platform add android
 
-          # كتابة config.xml محسّن وآمن أكثر
           cat << 'EOF' > config.xml
           <?xml version='1.0' encoding='utf-8'?>
           <widget id="com.hassan.cyberbotderiv" version="7.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -49,17 +46,9 @@ jobs:
               <author email="support@cyberbot.local" href="https://cyberbot.local">Hassan Omar</author>
               <content src="index.html" />
 
-              <!-- أمان أفضل: تقييد الوصول -->
-              <access origin="https://*.deriv.com" />
-              <access origin="https://*.derivws.com" />
-              <access origin="wss://*.derivws.com" />
-              <access origin="https://ws.derivws.com" />
-              <access origin="wss://ws.derivws.com" />
-
-              <allow-navigation href="https://*.deriv.com/*" />
-              <allow-navigation href="https://*.derivws.com/*" />
-              <allow-navigation href="wss://*.derivws.com/*" />
-
+              <!-- السماح بالاتصال بـ Deriv + الملفات المحلية -->
+              <access origin="*" />
+              <allow-navigation href="*" />
               <allow-intent href="http://*/*" />
               <allow-intent href="https://*/*" />
               <allow-intent href="tel:*" />
@@ -69,25 +58,40 @@ jobs:
 
               <preference name="SplashMaintainAspectRatio" value="true" />
               <preference name="SplashShowOnlyFirstTime" value="false" />
-              <preference name="SplashScreenDelay" value="2000" />
-              <preference name="FadeSplashScreenDuration" value="400" />
+              <preference name="SplashScreenDelay" value="1500" />
+              <preference name="FadeSplashScreenDuration" value="300" />
               <preference name="AndroidInsecureFileModeEnabled" value="true" />
               <preference name="AndroidLaunchMode" value="singleTop" />
               <preference name="DisallowOverscroll" value="true" />
               <preference name="Fullscreen" value="false" />
               <preference name="Orientation" value="portrait" />
+              <preference name="StatusBarBackgroundColor" value="#03060f" />
+              <preference name="StatusBarStyle" value="lightcontent" />
+              <preference name="AndroidWindowSplashScreenBackground" value="#03060f" />
 
               <platform name="android">
-                  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/img/logo.png" />
-                  <preference name="AndroidWindowSplashScreenBackground" value="#03060f" />
-                  <preference name="StatusBarBackgroundColor" value="#03060f" />
-                  <preference name="StatusBarStyle" value="lightcontent" />
-
                   <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
                       <application android:usesCleartextTraffic="true" />
                   </edit-config>
 
                   <uses-permission android:name="android.permission.INTERNET" />
                   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-                  <uses-permission android:name=
-... 
+                  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+                  <uses-permission android:name="android.permission.VIBRATE" />
+              </platform>
+          </widget>
+          EOF
+
+          cordova build android --debug
+
+      - name: Rename APK
+        run: |
+          cp cyberbot_app/platforms/android/app/build/outputs/apk/debug/app-debug.apk CyberBot-Deriv-Pro-v7.apk
+          ls -lh CyberBot-Deriv-Pro-v7.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CyberBot-Deriv-Pro-v7-APK
+          path: CyberBot-Deriv-Pro-v7.apk
+          retention-days: 30
