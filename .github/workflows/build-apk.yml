@@ -1,0 +1,93 @@
+name: Build CyberBot Deriv APK v7
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-android-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Apache Cordova
+        run: npm install -g cordova
+
+      - name: Create & Configure Cordova Android Project
+        run: |
+          cordova create cyberbot_app com.hassan.cyberbotderiv "CyberBot Deriv Pro"
+          cp index.html cyberbot_app/www/index.html
+          # نسخ أي أيقونات أو صور إن وجدت
+          cp *.png cyberbot_app/www/ 2>/dev/null || true
+          cp *.jpg cyberbot_app/www/ 2>/dev/null || true
+          cp *.svg cyberbot_app/www/ 2>/dev/null || true
+          cd cyberbot_app
+
+          # إضافة منصة أندرويد
+          cordova platform add android
+
+          # كتابة config.xml محسّن وآمن أكثر
+          cat << 'EOF' > config.xml
+          <?xml version='1.0' encoding='utf-8'?>
+          <widget id="com.hassan.cyberbotderiv" version="7.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+              <name>CyberBot Deriv Pro</name>
+              <description>AI Trading Robot with Deriv API, Economic News Radar and Advanced Risk Management - v7.0 Ultimate</description>
+              <author email="support@cyberbot.local" href="https://cyberbot.local">Hassan Omar</author>
+              <content src="index.html" />
+
+              <!-- أمان أفضل: تقييد الوصول -->
+              <access origin="https://*.deriv.com" />
+              <access origin="https://*.derivws.com" />
+              <access origin="wss://*.derivws.com" />
+              <access origin="https://ws.derivws.com" />
+              <access origin="wss://ws.derivws.com" />
+
+              <allow-navigation href="https://*.deriv.com/*" />
+              <allow-navigation href="https://*.derivws.com/*" />
+              <allow-navigation href="wss://*.derivws.com/*" />
+
+              <allow-intent href="http://*/*" />
+              <allow-intent href="https://*/*" />
+              <allow-intent href="tel:*" />
+              <allow-intent href="sms:*" />
+              <allow-intent href="mailto:*" />
+              <allow-intent href="geo:*" />
+
+              <preference name="SplashMaintainAspectRatio" value="true" />
+              <preference name="SplashShowOnlyFirstTime" value="false" />
+              <preference name="SplashScreenDelay" value="2000" />
+              <preference name="FadeSplashScreenDuration" value="400" />
+              <preference name="AndroidInsecureFileModeEnabled" value="true" />
+              <preference name="AndroidLaunchMode" value="singleTop" />
+              <preference name="DisallowOverscroll" value="true" />
+              <preference name="Fullscreen" value="false" />
+              <preference name="Orientation" value="portrait" />
+
+              <platform name="android">
+                  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/img/logo.png" />
+                  <preference name="AndroidWindowSplashScreenBackground" value="#03060f" />
+                  <preference name="StatusBarBackgroundColor" value="#03060f" />
+                  <preference name="StatusBarStyle" value="lightcontent" />
+
+                  <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+                      <application android:usesCleartextTraffic="true" />
+                  </edit-config>
+
+                  <uses-permission android:name="android.permission.INTERNET" />
+                  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+                  <uses-permission android:name=
+... 
