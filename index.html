@@ -3,137 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.deriv.com https://*.derivws.com wss://*.derivws.com data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.deriv.com wss://*.derivws.com https://*.derivws.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: blob: gap: https: http: ws: wss: 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: blob: content:; connect-src * data: blob: ws: wss: https: http:;">
   <meta name="theme-color" content="#03060f" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>CyberBot Deriv Pro v7.0 Ultimate</title>
+  <title>CyberBot Deriv Pro v7.0</title>
   <style>
-    :root {
-      --bg-deep: #03060f;
-      --bg-card: rgba(10, 17, 35, 0.92);
-      --bg-glass: rgba(16, 28, 56, 0.78);
-      --cyan: #00f0ff;
-      --blue: #2979ff;
-      --purple: #8b5cf6;
-      --green: #00e676;
-      --red: #ff3b5c;
-      --gold: #ffcc00;
-      --text: #f8fafc;
-      --muted: #8fa2c7;
-      --border: rgba(0, 240, 255, 0.28);
-      --shadow-glow: 0 0 28px rgba(0, 240, 255, 0.22);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background-color: var(--bg-deep);
-      background-image:
-        radial-gradient(circle at 12% 14%, rgba(0, 240, 255, 0.16) 0%, transparent 45%),
-        radial-gradient(circle at 88% 20%, rgba(139, 92, 246, 0.18) 0%, transparent 48%),
-        radial-gradient(circle at 50% 90%, rgba(41, 121, 255, 0.14) 0%, transparent 55%),
-        linear-gradient(180deg, rgba(3, 6, 15, 0.88) 0%, rgba(3, 6, 15, 0.97) 100%);
-      background-attachment: fixed;
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ========== شاشة الدخول القوية ========== */
-    .auth-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: radial-gradient(circle at top, #0d1d42 0%, #03060f 85%);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .auth-box {
-      width: 100%;
-      max-width: 440px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 26px;
-      padding: 28px 24px;
-      box-shadow: var(--shadow-glow);
-      backdrop-filter: blur(18px);
-      text-align: center;
-    }
-
-    .robot-orb {
-      width: 110px;
-      height: 110px;
-      margin: 0 auto 16px;
-      border-radius: 50%;
-      border: 2.5px solid var(--cyan);
-      background: radial-gradient(circle at 40% 35%, rgba(0, 240, 255, 0.35), #060c1d 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 36px rgba(0, 240, 255, 0.45);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .robot-orb::after {
-      content: "";
-      position: absolute;
-      inset: -2px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 240, 255, 0.15);
-      animation: pulseRing 2.8s ease-in-out infinite;
-    }
-
-    @keyframes pulseRing {
-      0%, 100% { transform: scale(1); opacity: 0.6; }
-      50% { transform: scale(1.08); opacity: 0.2; }
-    }
-
-    .auth-title {
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-    }
-    .auth-title span { color: var(--cyan); }
-
-    .auth-sub {
-      font-size: 12.5px;
-      color: var(--muted);
-      margin: 8px 0 20px;
-      line-height: 1.65;
-    }
-
-    .input-group {
-      text-align: right;
-      margin-bottom: 14px;
-    }
-    .input-group label {
-      display: block;
-      font-size: 12px;
-      color: var(--cyan);
-      margin-bottom: 6px;
-      font-weight: 700;
-    }
-
-    .input-field {
-      width: 100%;
-      padding: 13px 15px;
-      border-radius: 14px;
-      background: rgba(4, 9, 22, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      tra
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
+    html,body{background:#03060f;color:#f8fafc;min-height:100%;height:100%;overflow-x:hidden}
+    body{background-image:radial-gradient(circle at 12% 14%,rgba(0,240,255,.16) 0%,transparent 45%),radial-gradient(circle at 88% 20%,rgba(139,92,246,.18) 0%,transparent 48%)}
+    .auth-overlay{position:fixed;inset:0;z-index:200;background:radial-gradient(circle at top,#0d1d42 0%,#03060f 85%);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;overflow-y:auto}
+    .auth-box{width:100%;max-width:420px;background:rgba(10,17,35,.95);border:1px solid rgba(0,240,255,.3);border-radius:24px;padding:26px 22px;box-shadow:0 0 40px rgba(0,240,255,.2);text-align:center}
+    .robot-orb{width:100px;height:100px;margin:0 auto 14px;border-radius:50%;border:2.5px solid #00f0ff;background:radial-gradient(circle at 40% 35%,rgba(0,240,255,.3),#060c1d 70%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(0,240,255,.4)}
+    .auth-title{font-size:24px;font-weight:900}.auth-title span{color:#00f0ff}
+    .auth-sub{font-size:12.5px;color:#8fa2c7;margin:8px 0 18px;line-height:1.6}
+    .input-group{text-align:right;margin-bottom:13px}
+    .input-group label{display:block;font-size:12px;color:#00f0ff;margin-bottom:6px;font-weight:700}
+    .input-field{width:100%;padding:13px 14px;border-radius:13px;background:rgba(4,9,22,.95);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:14px;outline:none}
+    .input-field:focus{border-color:#00f0ff;box-shadow:0 0 12px rgba(0,240,255,.25)}
+    .btn-primary{width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#00e5ff 0%,#2979ff 52%,#7c3aed 100%);color:#fff;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 6px 22px rgba(41,121,255,.35)}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed}
+    .btn-secondary{width:100%;padding:12px;border-radius:14px;margin-top:10px;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.3);color:#00f0ff;font-size:13.5px;font-weight:700;cursor:pointer}
+    .security-note{margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.15);font-size:11px;color:#8fa2c7;line-height:1.5;text-align:right}
+    .pin-section{display:none;margin-top:8px}.pin-section.show{display:block}
+    .pin-dots{display:flex;justify-content:center;gap:12px;margin:14px 0 16px}
+    .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #00f0ff;background:transparent}
+    .pin-dot.filled{background:#00f0ff;box-shadow:0 0 8px rgba(0,240,255,.5)}
+    .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:250px;margin:0 auto}
+    .pin-key{height:50px;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:20px;font-weight:700;cursor:pointer}
+    .app-shell{display:none;padding-bottom:90px;min-height:100vh}
+    .topbar{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(3,6,15,.95);border-bottom:1px solid rgba(0,240,255,.25)}
+    .brand-row{display:flex;align-items:center;gap:10px}
+    .brand-badge{width:40px;height:40px;border-radius:12px;border:1.8px solid #00f0ff;background:#081226;display:flex;align-items:center;justify-conte
 ... 
